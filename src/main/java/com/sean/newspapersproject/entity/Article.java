@@ -1,5 +1,8 @@
 package com.sean.newspapersproject.entity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -19,15 +22,15 @@ public class Article {
     private String text;
     private LocalDateTime createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "user_id")
     private User userId;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "magazine_id")
     private Magazine magazine;
 
@@ -107,5 +110,20 @@ public class Article {
 
     public void setMagazine(Magazine magazine) {
         this.magazine = magazine;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Article{" +
+                "articleId=" + articleId +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", text='" + text + '\'' +
+                ", createdAt=" + createdAt +
+                ", userId=" + userId +
+                ", category=" + category +
+                ", magazine=" + magazine +
+                '}';
     }
 }
