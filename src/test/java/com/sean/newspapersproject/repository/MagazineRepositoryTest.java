@@ -14,8 +14,15 @@ class MagazineRepositoryTest {
     private MagazineRepository magazineRepository;
 
     @Test
-    public void saveMagazine() {
+    public void testSaveMagazine() {
         Magazine magazine = new Magazine("Fashion Magazine");
-//        magazineRepository.save(magazine);
+        magazineRepository.save(magazine);
+    }
+
+    @Test
+    public void testGetMagazine() {
+        Magazine expectedMagazine = new Magazine("Fashion Magazine");
+        Magazine actualMagazine = magazineRepository.findByName("Fashion Magazine");
+        assertEquals(expectedMagazine.getName(), actualMagazine.getName());
     }
 }

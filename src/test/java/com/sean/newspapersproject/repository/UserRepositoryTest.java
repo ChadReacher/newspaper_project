@@ -14,8 +14,15 @@ class UserRepositoryTest {
     private UserRepository userRepository;
 
     @Test
-    public void saveUser() {
+    public void testSavingUser() {
         User user = new User("admin", "admin", "admin@admin.com");
-//        userRepository.save(user);
+        userRepository.save(user);
+    }
+
+    @Test
+    public void testGettingUser() {
+        String username = "admin";
+        User actualUser = userRepository.findByUsername(username);
+        assertEquals(actualUser.getUsername(), username);
     }
 }
