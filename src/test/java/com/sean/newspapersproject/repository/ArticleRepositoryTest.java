@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 class ArticleRepositoryTest {
 
     @Autowired
@@ -27,16 +29,13 @@ class ArticleRepositoryTest {
     private UserRepository userRepository;
 
     @Test
-    public void itShouldReturnArticle() {
-        Article article = articleRepository.findById(2L).get();
-        System.out.println(article);
-    }
-    @Test
     public void testSavingArticle() {
-        User user = userRepository.findByUsername("username");
-        Category category1 = categoryRepository.findByName("Sport");
-        Magazine magazine = magazineRepository.findByName("Fashion Magazine");
-
+        User user = new User("username", "username", "user@name.com");
+        userRepository.save(user);
+        Category category1 = new Category("Sport");
+        categoryRepository.save(category1);
+        Magazine magazine = new Magazine("Fashion Magazine");
+        magazineRepository.save(magazine);
         Article article1 = new Article(
                 "New article",
                 "Brief description of this article",
@@ -58,6 +57,13 @@ class ArticleRepositoryTest {
         );
         articleRepository.save(article1);
         articleRepository.save(article2);
+    }
+
+    @Test
+    public void itShouldReturnArticle() {
+        String expectedTitle = "New article2";
+        Article article = articleRepository.findById(2L).get();
+        assertEquals(expectedTitle, article.getTitle());
     }
 
 }

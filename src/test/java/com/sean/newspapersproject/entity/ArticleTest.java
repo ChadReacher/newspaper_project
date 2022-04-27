@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ArticleTest {
+public class ArticleTest {
 
     private Article article;
 

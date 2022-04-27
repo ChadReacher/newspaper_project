@@ -74,7 +74,7 @@
               <p th:text="${article.getDescription()}"></p>
               <p>Text:</p>
               <p th:text="${article.getText()}"></p>
-                <form th:method="POST" th:action="@{/delete-article/{id}( id= ${ article.getArticleId() } )}">
+                <form th:method="POST" th:action="@{/delete-article/{id}( id= ${ article.getArticleId() } )}" id="deleteArticleForm">
                     <input type="submit" value="Delete" class="btn btn-danger mt-3" style = "display: inline-block; margin-left: 15%;">
                 </form>
             </article>
