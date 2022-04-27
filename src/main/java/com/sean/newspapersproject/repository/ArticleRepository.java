@@ -20,12 +20,4 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
                     "where a.articleId = :id")
     void updateArticleById(@Param("id") Long id, @Param("article") Article updatedArticle);
 
-
-//    @Override
-//    @Modifying
-//    @Query(
-//            value = "DELETE FROM article WHERE article_id = :id",
-//            nativeQuery = true
-//    )
-//    void deleteById(@Param("id") Long aLong);
 }

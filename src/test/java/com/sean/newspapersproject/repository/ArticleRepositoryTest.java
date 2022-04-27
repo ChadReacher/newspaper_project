@@ -30,7 +30,6 @@ class ArticleRepositoryTest {
     public void itShouldReturnArticle() {
         Article article = articleRepository.findById(2L).get();
         System.out.println(article);
-//        when(articleRepository.getById(2L)).thenReturn(null);
     }
     @Test
     public void testSavingArticle() {
