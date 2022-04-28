@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -52,9 +52,10 @@
           <div class="col-md-8">
             <article class="blog-post">
                 <h2 class="blog-post-title" style = "" th:text="${article.getTitle()}">
-                    <span class="badge badge-pill badge-info" style = "background: black; font-size: 1vw;">Science</span>
+                    <span class="badge badge-pill badge-info" style = "background: black; font-size: 1vw;" th:text="${article.getCategory().getName()}"></span>
                 </h2>
-                <p class="blog-post-meta" style = "" th:text="${article.getCreatedAt()}"> <a href="" style="text-decoration: none; color: black;" th:text="${article.getUserId().getUsername()}"></a></span></p>
+                <p class="blog-post-meta" style = "" th:text="${article.getCreatedAt()}"></p>
+                <a style="text-decoration: none; color: black;" th:text="${article.getUserId().getUsername()}"></a>
 
 
                 <!-- Author card -->

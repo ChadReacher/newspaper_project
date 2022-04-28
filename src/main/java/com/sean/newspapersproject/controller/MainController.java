@@ -2,11 +2,13 @@ package com.sean.newspapersproject.controller;
 
 import com.sean.newspapersproject.entity.Article;
 import com.sean.newspapersproject.entity.Category;
+import com.sean.newspapersproject.entity.Magazine;
 import com.sean.newspapersproject.entity.User;
 import com.sean.newspapersproject.repository.ArticleRepository;
 import com.sean.newspapersproject.repository.CategoryRepository;
 import com.sean.newspapersproject.repository.UserRepository;
 import com.sean.newspapersproject.service.ArticleService;
+import com.sean.newspapersproject.service.MagazineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,12 +25,17 @@ public class MainController {
     private ArticleService articleService;
     private CategoryRepository categoryRepository;
     private UserRepository userRepository;
+    private MagazineService magazineService;
 
     @Autowired
-    public MainController(ArticleService articleService, CategoryRepository categoryRepository, UserRepository userRepository) {
+    public MainController(ArticleService articleService,
+                          CategoryRepository categoryRepository,
+                          UserRepository userRepository,
+                          MagazineService magazineService) {
         this.articleService = articleService;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.magazineService = magazineService;
     }
 
     @GetMapping
@@ -79,5 +86,12 @@ public class MainController {
     public String deleteArticleById(@PathVariable("id") Long id) {
         articleService.delete(id);
         return "redirect:/";
+    }
+
+    @GetMapping("magazine/{id}")
+    public String getMagazinePageById(@PathVariable("id") Long id, Model model) {
+        Magazine magazine = magazineService.getMagazineById(id);
+        model.addAttribute("magazine", magazine);
+        return "single_magazine";
     }
 }
