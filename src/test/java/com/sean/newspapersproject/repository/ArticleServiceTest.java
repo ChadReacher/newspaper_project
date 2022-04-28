@@ -4,8 +4,11 @@ import com.sean.newspapersproject.entity.Article;
 import com.sean.newspapersproject.entity.Category;
 import com.sean.newspapersproject.entity.Magazine;
 import com.sean.newspapersproject.entity.User;
+import com.sean.newspapersproject.service.ArticleService;
+import com.sean.newspapersproject.service.CategoryService;
+import com.sean.newspapersproject.service.MagazineService;
+import com.sean.newspapersproject.service.UserService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -13,31 +16,30 @@ import org.springframework.test.context.TestPropertySource;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
-class ArticleRepositoryTest {
+class ArticleServiceTest {
 
     @Autowired
-    private ArticleRepository articleRepository;
+    private ArticleService articleService;
     @Autowired
-    private CategoryRepository categoryRepository;
+    private UserService userService;
     @Autowired
-    private MagazineRepository magazineRepository;
+    private CategoryService categoryService;
     @Autowired
-    private UserRepository userRepository;
+    private MagazineService magazineService;
 
     @Test
     public void testSavingArticle() {
         User user = new User("username", "username", "user@name.com");
-        userRepository.save(user);
+        userService.save(user);
         Category category1 = new Category("Sport");
-        categoryRepository.save(category1);
+        categoryService.save(category1);
         Magazine magazine = new Magazine("Fashion Magazine");
-        magazineRepository.save(magazine);
+        magazineService.save(magazine);
         Article article1 = new Article(
-                "New article",
+                "New Article",
                 "Brief description of this article",
                 "Some text",
                 LocalDateTime.now(),
@@ -55,15 +57,24 @@ class ArticleRepositoryTest {
                 category1,
                 magazine
         );
-        articleRepository.save(article1);
-        articleRepository.save(article2);
-    }
+        articleService.save(article1);
+        articleService.save(article2);
 
-    @Test
-    public void itShouldReturnArticle() {
-        String expectedTitle = "New article2";
-        Article article = articleRepository.findById(2L).get();
-        assertEquals(expectedTitle, article.getTitle());
+        Article gotArticle1 = articleService.getArticleById(1L);
+        Article gotArticle2 = articleService.getArticleById(2L);
+        assertNotNull(gotArticle1);
+        assertNotNull(gotArticle2);
+        assertEquals("New Article", gotArticle1.getTitle());
+        assertEquals("Brief description of this article", gotArticle1.getDescription());
+        assertEquals("Some text", gotArticle1.getText());
+
+        articleService.update(1L, article2);
+        Article gotArticle3 = articleService.getArticleById(1L);
+        assertNotNull(gotArticle3);
+        assertEquals("New article2", gotArticle3.getTitle());
+        assertEquals("Brief description2 of this article", gotArticle3.getDescription());
+        assertEquals("Some text2", gotArticle3.getText());
+
     }
 
 }

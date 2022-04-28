@@ -2,13 +2,14 @@ package com.sean.newspapersproject.controller;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
-import com.sean.newspapersproject.NewspapersProjectApplication;
 import com.sean.newspapersproject.entity.Article;
 import com.sean.newspapersproject.entity.Category;
 import com.sean.newspapersproject.entity.User;
-import com.sean.newspapersproject.repository.ArticleRepository;
 import com.sean.newspapersproject.repository.CategoryRepository;
 import com.sean.newspapersproject.repository.UserRepository;
+import com.sean.newspapersproject.service.ArticleService;
+import com.sean.newspapersproject.service.CategoryService;
+import com.sean.newspapersproject.service.UserService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -40,13 +41,13 @@ public class MainControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ArticleRepository articleRepository;
+    private ArticleService articleService;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private CategoryService categoryService;
 
     private WebClient webClient;
 
@@ -78,8 +79,8 @@ public class MainControllerTest {
     public void testPostingArticle() throws Exception {
         User user = new User("username", "username", "user@name.com");
         Category category = new Category("Sport");
-        userRepository.save(user);
-        categoryRepository.save(category);
+        userService.save(user);
+        categoryService.save(category);
 
         Long articleId = 1L;
         String title = "Test title";
@@ -109,7 +110,7 @@ public class MainControllerTest {
         HtmlSubmitInput submit = form.getOneHtmlElementByAttribute("input", "type", "submit");
         submit.click();
 
-        Article article = articleRepository.findById(articleId).get();
+        Article article = articleService.getArticleById(articleId);
 
         assertNotNull(article);
     }
@@ -118,7 +119,7 @@ public class MainControllerTest {
     @Order(4)
     public void testArticlePageByExistingIdExists() throws Exception {
         Long articleId = 1L;
-        Article article = articleRepository.findById(articleId).get();
+        Article article = articleService.getArticleById(articleId);
         this.mockMvc.perform(MockMvcRequestBuilders.get("/article/{id}", articleId))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString(article.getTitle())))
@@ -152,7 +153,7 @@ public class MainControllerTest {
         HtmlSubmitInput submit = form.getOneHtmlElementByAttribute("input", "type", "submit");
         submit.click();
 
-        Article article = articleRepository.findById(articleId).get();
+        Article article = articleService.getArticleById(articleId);
 
         assertNotNull(article);
     }
@@ -170,8 +171,8 @@ public class MainControllerTest {
         HtmlSubmitInput submit = form.getOneHtmlElementByAttribute("input", "type", "submit");
         submit.click();
 
-        boolean articleDoesNotExist = articleRepository.findById(articleId).isEmpty();
+        Article article = articleService.getArticleById(articleId);
 
-        assertTrue(articleDoesNotExist);
+        assertNull(article);
     }
 }

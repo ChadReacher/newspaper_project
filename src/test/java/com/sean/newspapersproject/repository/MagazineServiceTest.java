@@ -1,7 +1,7 @@
 package com.sean.newspapersproject.repository;
 
-import com.sean.newspapersproject.NewspapersProjectApplication;
 import com.sean.newspapersproject.entity.Magazine;
+import com.sean.newspapersproject.service.MagazineService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,21 +11,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
-class MagazineRepositoryTest {
+class MagazineServiceTest {
 
     @Autowired
-    private MagazineRepository magazineRepository;
+    private MagazineService magazineService;
 
     @Test
     public void testSaveMagazine() {
         Magazine magazine = new Magazine("Fashion Magazine");
-        magazineRepository.save(magazine);
+        magazineService.save(magazine);
     }
 
     @Test
     public void testGetMagazine() {
         Magazine expectedMagazine = new Magazine("Fashion Magazine");
-        Magazine actualMagazine = magazineRepository.findByName("Fashion Magazine");
+        Magazine actualMagazine = magazineService.getMagazineByName("Fashion Magazine");
         assertEquals(expectedMagazine.getName(), actualMagazine.getName());
     }
 }

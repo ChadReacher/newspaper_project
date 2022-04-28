@@ -1,8 +1,9 @@
 package com.sean.newspapersproject.repository;
 
-import com.sean.newspapersproject.NewspapersProjectApplication;
 import com.sean.newspapersproject.entity.Comment;
 import com.sean.newspapersproject.entity.User;
+import com.sean.newspapersproject.service.CommentService;
+import com.sean.newspapersproject.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,26 +15,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
-class CommentRepositoryTest  {
+class CommentServiceTest {
 
     @Autowired
-    private CommentRepository commentRepository;
+    private CommentService commentService;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    CommentRepositoryTest(CommentRepository commentRepository, UserRepository userRepository) {
-        this.commentRepository = commentRepository;
-        this.userRepository = userRepository;
-    }
+    private UserService userService;
 
     @Test
     public void testCommentGettingFromDB() {
-        User user = userRepository.findByUsername("username");
+        User user = userService.getUserByUsername("username");
         Comment expectedComment = new Comment(user, "Some message", LocalDateTime.now());
-        commentRepository.save(expectedComment);
-        Comment actualComment = commentRepository.findByUserId(user).stream().findFirst().orElse(null);
+        commentService.save(expectedComment);
+        Comment actualComment = commentService.getCommentsByUsername("username").stream().findFirst().orElse(null);
         assertEquals(expectedComment.getMessage(), actualComment.getMessage());
     }
 }

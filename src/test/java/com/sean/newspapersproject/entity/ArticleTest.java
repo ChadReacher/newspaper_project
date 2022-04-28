@@ -18,8 +18,6 @@ public class ArticleTest {
         Magazine magazine = new Magazine("Fashion-profession");
         this.article = new Article("Interesting title", "Short description", "Big text", LocalDateTime.now(),
                 user, category, null);
-//        this.article = new Article("Interesting title", "Short description", "Big text", LocalDateTime.now(),
-//                null, category, magazine);
     }
 
 
