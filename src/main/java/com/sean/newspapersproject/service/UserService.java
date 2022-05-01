@@ -1,7 +1,10 @@
 package com.sean.newspapersproject.service;
 
+import com.sean.newspapersproject.entity.Article;
+import com.sean.newspapersproject.entity.Comment;
 import com.sean.newspapersproject.entity.Magazine;
 import com.sean.newspapersproject.entity.User;
+import com.sean.newspapersproject.repository.ArticleRepository;
 import com.sean.newspapersproject.repository.MagazineRepository;
 import com.sean.newspapersproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +19,15 @@ public class UserService {
 
     private UserRepository userRepository;
     private MagazineRepository magazineRepository;
+    private ArticleService articleService;
+    private CommentService commentService;
 
     @Autowired
-    public UserService(UserRepository userRepository, MagazineRepository magazineRepository) {
+    public UserService(UserRepository userRepository, MagazineRepository magazineRepository, ArticleService articleService, CommentService commentService) {
         this.userRepository = userRepository;
         this.magazineRepository = magazineRepository;
+        this.articleService = articleService;
+        this.commentService = commentService;
     }
 
 
@@ -57,6 +64,15 @@ public class UserService {
 
     @Transactional
     public void delete(Long id) {
+        List<Article> articles = articleService.getAllArticlesByUserId(id);
+        List<Comment> comments = commentService.getCommentsByUserId(id);
+        for (Article article : articles) {
+            articleService.delete(article);
+        }
+
+        for (Comment comment : comments) {
+            commentService.delete(comment);
+        }
         userRepository.deleteById(id);
     }
 }

@@ -5,6 +5,9 @@ import com.sean.newspapersproject.entity.Category;
 import com.sean.newspapersproject.entity.User;
 import com.sean.newspapersproject.repository.ArticleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +34,17 @@ public class ArticleService {
     public Article getArticleById(Long id) {
         Article article = articleRepository.findById(id).orElse(null);
         return article;
+    }
+
+    public List<Article> getArticlesPages(Integer pageNumber) {
+        Pageable firstPageWithTenArticles = PageRequest.of(pageNumber - 1, 10);
+        List<Article> articles = articleRepository.findAll(firstPageWithTenArticles).toList();
+        return articles;
+    }
+
+    public List<Article> getAllArticlesByUserId(Long id) {
+        List<Article> articles = articleRepository.findAllByUserId(id);
+        return articles;
     }
 
     public void saveArticleWithUser(Article article, User user) {
@@ -62,4 +76,10 @@ public class ArticleService {
     public void delete(Long id) {
         articleRepository.deleteById(id);
     }
+
+    @Transactional
+    public void delete(Article article) {
+        articleRepository.delete(article);
+    }
+
 }

@@ -54,9 +54,7 @@
             <div class="mb-3">
               <label for="formGroupSelect" class="form-label">Select article category:</label>
               <select name="category" th:field="*{category.name}" class="form-select" aria-label="Default select example" id="formGroupSelect">
-                  <option value="Business">Business</option>
-                  <option value="Sport">Sport</option>
-                  <option value="Family">Family</option>
+                  <option th:each="scategory: ${categories}" th:text ="${scategory.getName()}" th:value ="${scategory.getName()}"></option>
               </select>
             </div>
 

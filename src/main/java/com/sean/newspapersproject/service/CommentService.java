@@ -41,6 +41,12 @@ public class CommentService {
         return comments;
     }
 
+    public List<Comment> getCommentsByUserId(Long id) {
+        User user = userRepository.getById(id);
+        List<Comment> comments = commentRepository.findByUserId(user);
+        return comments;
+    }
+
     public void save(Comment comment) {
         commentRepository.save(comment);
     }
@@ -53,5 +59,10 @@ public class CommentService {
     @Transactional
     public void delete(Long id) {
         commentRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void delete(Comment comment) {
+        commentRepository.delete(comment);
     }
 }
