@@ -28,4 +28,6 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
             nativeQuery = true
     )
     List<Article> findAllByUserId(@Param("id") Long id);
+
+    List<Article> findAllByTitle(String articleTitle);
 }

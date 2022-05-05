@@ -47,6 +47,11 @@ public class ArticleService {
         return articles;
     }
 
+    public List<Article> getArticleByTitle(String articleTitle) {
+        List<Article> articles = articleRepository.findAllByTitle(articleTitle);
+        return articles;
+    }
+
     public void saveArticleWithUser(Article article, User user) {
         Category category = categoryService.getCategoryByName(article.getCategory().getName());
         article.setCategory(category);

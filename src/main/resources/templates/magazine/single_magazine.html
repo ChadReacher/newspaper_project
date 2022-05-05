@@ -75,6 +75,10 @@
         <p>
           <a href="#" class="btn btn-primary my-2">Start to follow</a>
         </p>
+        <p th:text="${magazine.getName()}"></p>
+        <form th:method="POST" th:action="@{/delete-magazine/{id}( id= ${ magazine.getMagazineId() } )}" id="deleteArticleForm">
+          <input type="submit" value="Delete" class="btn btn-danger mt-3" style = "display: inline-block; margin-left: 15%;">
+        </form>
       </div>
     </div>
   </section>

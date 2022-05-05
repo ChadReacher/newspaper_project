@@ -63,7 +63,7 @@
 
       <div class="container-fluid">
         <div class="row">
-          <nav th:replace="header :: header">
+          <nav th:replace="fragments/header :: header">
           </nav>
 
           <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4"><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
@@ -133,14 +133,15 @@
                     <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal2">
                       Edit
                     </button>
+
                     <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                       <div class="modal-dialog">
                         <div class="modal-content">
                           <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel2">Edit magazine</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <a type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></a>
                           </div>
-                          <form th:method="POST" th:action="@{/admin/magazines/update/{id}(id=${magazine.getMagazineId()})}">
+                          <form th:method="POST" th:action="@{/magazine-update/{id} (id=${magazine.getMagazineId()})}">
                             <div class="modal-body">
                               <div class="mb-3">
                                 <label for="exampleFormControlInput1" class="form-label">Name of magazine</label>
@@ -160,7 +161,7 @@
 
 
 
-                    <form th:method="POST" th:action="@{/admin/magazines/delete/{id}(id=${magazine.getMagazineId()})}" style="display: inline-block;">
+                    <form th:method="POST" th:action="@{/delete-magazine/{id} (id=${magazine.getMagazineId()})}" style="display: inline-block;">
                       <input type="submit" class="btn btn-danger btn-sm" value="Delete">
                     </form>
                   </td>

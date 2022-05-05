@@ -32,19 +32,19 @@ public class AdminController {
     @GetMapping
     public String getDashboardPage(Model model) {
         model.addAttribute("articles", articleService.getAllArticles());
-        return "admin_page";
+        return "admin/admin_page";
     }
 
     @GetMapping("/articles")
     public String getAllArticlesAdminPage(@RequestParam(required = false, name = "page", defaultValue = "1") Integer pageNumber,
                                           Model model) {
         List<Article> allArticles = articleService.getArticlesPages(pageNumber);
-
         model.addAttribute("articles", allArticles);
         model.addAttribute("currentPageNumber", pageNumber);
         model.addAttribute("quantityOfPages", articleService.getAllArticles().size() / 10);
-        return "admin_page_articles";
+        return "admin/admin_page_articles";
     }
+
 
     @PostMapping("/articles")
     public String deleteArticleByIdAdmin(@RequestParam("articleId") String id) {
@@ -55,7 +55,7 @@ public class AdminController {
     @GetMapping("/magazines")
     public String getAllMagazinesAdminPage(Model model) {
         model.addAttribute("magazines", magazineService.getAllMagazines());
-        return "admin_page_magazines";
+        return "admin/admin_page_magazines";
     }
 
     @PostMapping("/magazines")
@@ -64,25 +64,25 @@ public class AdminController {
         return "redirect:/admin/magazines";
     }
 
-    @PostMapping("/magazines/update/{id}")
-    public String createMagazineAdminPage(@PathVariable("id") Long id, @ModelAttribute("magazine") Magazine magazine) {
-        Magazine magazineToUpdate = magazineService.getMagazineById(id);
-        magazineToUpdate.setName(magazine.getName());
-        magazineService.save(magazineToUpdate);
-        return "redirect:/admin/magazines";
-    }
-
-
-    @PostMapping("/magazines/delete/{id}")
-    public String deleteMagazineByIdAdmin(@PathVariable("id") Long id) {
-        magazineService.delete(id);
-        return "redirect:/admin/magazines";
-    }
+//    @PostMapping("/magazines/update/{id}")
+//    public String createMagazineAdminPage(@PathVariable("id") Long id, @ModelAttribute("magazine") Magazine magazine) {
+//        Magazine magazineToUpdate = magazineService.getMagazineById(id);
+//        magazineToUpdate.setName(magazine.getName());
+//        magazineService.save(magazineToUpdate);
+//        return "redirect:/admin/magazines";
+//    }
+//
+//
+//    @PostMapping("/magazines/delete/{id}")
+//    public String deleteMagazineByIdAdmin(@PathVariable("id") Long id) {
+//        magazineService.delete(id);
+//        return "redirect:/admin/magazines";
+//    }
 
     @GetMapping("/users")
     public String getAllUserAdminpage(Model model) {
         model.addAttribute("users", userService.getAllUsers());
-        return "admin_page_users";
+        return "admin/admin_page_users";
     }
 
     @PostMapping("/users")
@@ -90,13 +90,6 @@ public class AdminController {
         userService.delete((Long.valueOf(Integer.parseInt(id))));
         return "redirect:/admin/users";
     }
-
-
-
-
-
-
-
 
 
     @GetMapping("/categories")
@@ -114,7 +107,7 @@ public class AdminController {
             }
         }
         model.addAttribute("map", numberOfArticlesAccordingToCategory);
-        return "admin_page_categories";
+        return "admin/admin_page_categories";
     }
 
     @PostMapping("/categories")
