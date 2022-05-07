@@ -1,5 +1,6 @@
 package com.sean.newspapersproject.service;
 
+import com.sean.newspapersproject.entity.Article;
 import com.sean.newspapersproject.entity.Category;
 import com.sean.newspapersproject.entity.Comment;
 import com.sean.newspapersproject.entity.User;
@@ -19,6 +20,9 @@ public class CommentService {
     private CommentRepository commentRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ArticleService articleService;
+
 
     @Autowired
     public CommentService(CommentRepository commentRepository) {
@@ -38,6 +42,12 @@ public class CommentService {
     public List<Comment> getCommentsByUsername(String username) {
         User user = userRepository.findByUsername(username);
         List<Comment> comments = commentRepository.findByUserId(user);
+        return comments;
+    }
+
+    public List<Comment> getCommentsByRelatedArticleTitle(String articleTitle) {
+        Article article = articleService.getArticleByTitle(articleTitle).stream().findFirst().get();
+        List<Comment> comments = commentRepository.findByArticleId(article);
         return comments;
     }
 

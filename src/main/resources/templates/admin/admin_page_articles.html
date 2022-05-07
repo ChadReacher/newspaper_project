@@ -97,9 +97,9 @@
               <thead>
                 <tr>
                   <th scope="col">#</th>
-                  <th scope="col">Title</th>
-                  <th scope="col">Author</th>
-                  <th scope="col">Magazine</th>
+                  <th scope="col"><a style="text-decoration: none; color: black" th:href="@{'/admin/articles?page=' + ${currentPageNumber} + '&column=title'}">Title</a></th>
+                  <th scope="col"><a style="text-decoration: none; color: black" th:href="@{'/admin/articles?page=' + ${currentPageNumber} + '&column=userId'}">Author</a></th>
+                  <th scope="col"><a style="text-decoration: none; color: black" th:href="@{'/admin/articles?page=' + ${currentPageNumber} + '&column=magazine'}">Magazine</a></th>
                   <th scope="col">Views</th>
                   <th scope="col">Actions</th>
                 </tr>
@@ -142,11 +142,11 @@
                           </li>
 
                           <li th:if="${currentPageNumber} <= 4" class="page-item" th:classappend="${currentPageNumber} == 2 ? ' active' : ''">
-                              <a class="page-link" th:href="@{/admin/articles?page=2}" >2</a>
+                              <a class="page-link" th:href="@{/admin/articles?page=2}">2</a>
                           </li>
 
                           <li th:if="${currentPageNumber} <= 4"class="page-item" th:classappend="${currentPageNumber} == 3 ? ' active' : ''">
-                              <a class="page-link" th:href="@{/admin/articles?page=3}" >3</a>
+                              <a class="page-link" th:href="@{/admin/articles?page=3}">3</a>
                           </li>
 
 

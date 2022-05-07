@@ -5,9 +5,9 @@ import com.sean.newspapersproject.entity.Category;
 import com.sean.newspapersproject.entity.User;
 import com.sean.newspapersproject.repository.ArticleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +38,15 @@ public class ArticleService {
 
     public List<Article> getArticlesPages(Integer pageNumber) {
         Pageable firstPageWithTenArticles = PageRequest.of(pageNumber - 1, 10);
+        Sort sort = firstPageWithTenArticles.getSort();
         List<Article> articles = articleRepository.findAll(firstPageWithTenArticles).toList();
+        return articles;
+    }
+
+    public List<Article> getArticlesPages(Integer pageNumber, String sortColumn) {
+        Pageable firstPageWithTenArticlesSortedByName =
+                PageRequest.of(pageNumber - 1, 10, Sort.by(sortColumn).ascending());
+        List<Article> articles = articleRepository.findAll(firstPageWithTenArticlesSortedByName).toList();
         return articles;
     }
 

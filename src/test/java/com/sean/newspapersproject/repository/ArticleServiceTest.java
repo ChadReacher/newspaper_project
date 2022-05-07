@@ -32,11 +32,11 @@ class ArticleServiceTest {
 
     @Test
     public void testSavingArticle() {
-        User user = new User("username", "username", "user@name.com");
+        User user = new User("username", "Bob", "Moskey", "username", "user@name.com");
         userService.save(user);
         Category category1 = new Category("Sport");
         categoryService.save(category1);
-        Magazine magazine = new Magazine("Fashion Magazine");
+        Magazine magazine = new Magazine("Fashion Magazine", null);
         magazineService.save(magazine);
         Article article1 = new Article(
                 "New Article",
@@ -45,6 +45,7 @@ class ArticleServiceTest {
                 LocalDateTime.now(),
                 user,
                 category1,
+                null,
                 null
         );
 
@@ -55,7 +56,8 @@ class ArticleServiceTest {
                 LocalDateTime.now().plusHours(3),
                 null,
                 category1,
-                magazine
+                magazine,
+                null
         );
         articleService.save(article1);
         articleService.save(article2);

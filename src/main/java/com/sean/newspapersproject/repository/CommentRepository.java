@@ -16,6 +16,7 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findByUserId (User user);
+    List<Comment> findByArticleId(Article article);
 
     @Modifying
     @Transactional

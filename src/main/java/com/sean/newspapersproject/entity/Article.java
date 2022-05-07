@@ -22,6 +22,10 @@ public class Article {
     private String text;
     private LocalDateTime createdAt;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "image_id")
+    private Image imageId;
+
     @ManyToOne()
     @JoinColumn(name = "user_id")
     private User userId;
@@ -34,7 +38,8 @@ public class Article {
     @JoinColumn(name = "magazine_id")
     private Magazine magazine;
 
-    public Article(String title, String description, String text, LocalDateTime createdAt, User userId, Category category, Magazine magazine) {
+    public Article(String title, String description, String text, LocalDateTime createdAt, User userId, Category category, Magazine magazine,
+                   Image imageId) {
         this.title = title;
         this.description = description;
         this.text = text;
@@ -42,10 +47,19 @@ public class Article {
         this.userId = userId;
         this.category = category;
         this.magazine = magazine;
+        this.imageId = imageId;
     }
 
     public Article() {
 
+    }
+
+    public Image getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(Image imageId) {
+        this.imageId = imageId;
     }
 
     public Long getArticleId() {

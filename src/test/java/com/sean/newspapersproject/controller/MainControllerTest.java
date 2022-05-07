@@ -77,7 +77,7 @@ public class MainControllerTest {
     @Test
     @Order(3)
     public void testPostingArticle() throws Exception {
-        User user = new User("username", "username", "user@name.com");
+        User user = new User("username", "Tommy", "Resc", "username", "user@name.com");
         Category category = new Category("Sport");
         userService.save(user);
         categoryService.save(category);

@@ -18,13 +18,13 @@ class MagazineServiceTest {
 
     @Test
     public void testSaveMagazine() {
-        Magazine magazine = new Magazine("Fashion Magazine");
+        Magazine magazine = new Magazine("Fashion Magazine", null);
         magazineService.save(magazine);
     }
 
     @Test
     public void testGetMagazine() {
-        Magazine expectedMagazine = new Magazine("Fashion Magazine");
+        Magazine expectedMagazine = new Magazine("Fashion Magazine", null);
         Magazine actualMagazine = magazineService.getMagazineByName("Fashion Magazine");
         assertEquals(expectedMagazine.getName(), actualMagazine.getName());
     }

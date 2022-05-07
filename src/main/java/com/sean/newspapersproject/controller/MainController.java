@@ -1,18 +1,19 @@
 package com.sean.newspapersproject.controller;
 
-import com.sean.newspapersproject.entity.Article;
-import com.sean.newspapersproject.entity.Category;
-import com.sean.newspapersproject.entity.Magazine;
-import com.sean.newspapersproject.entity.User;
-import com.sean.newspapersproject.service.ArticleService;
-import com.sean.newspapersproject.service.CategoryService;
-import com.sean.newspapersproject.service.MagazineService;
-import com.sean.newspapersproject.service.UserService;
+import com.sean.newspapersproject.entity.*;
+import com.sean.newspapersproject.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,16 +26,19 @@ public class MainController {
     private final CategoryService categoryService;
     private final UserService userService;
     private final MagazineService magazineService;
+    private final ImageService imageService;
 
     @Autowired
     public MainController(ArticleService articleService,
                           CategoryService categoryService,
                           UserService userService,
-                          MagazineService magazineService) {
+                          MagazineService magazineService,
+                          ImageService imageService) {
         this.articleService = articleService;
         this.categoryService = categoryService;
         this.userService = userService;
         this.magazineService = magazineService;
+        this.imageService = imageService;
     }
 
     @GetMapping
@@ -47,6 +51,8 @@ public class MainController {
     @GetMapping("article/{id}")
     public String getArticlePage(@PathVariable("id") Long id, Model model) {
         Article article = articleService.getArticleById(id);
+        String imageString = Base64.getMimeEncoder().encodeToString(article.getImageId().getImageData());
+        model.addAttribute("imageString", imageString);
         model.addAttribute("article", article);
         return "single_article";
     }
@@ -61,7 +67,15 @@ public class MainController {
 
 
     @PostMapping("create-article")
-    public String getArticleFromFormAndSave(@ModelAttribute("article") Article article) {
+    public String getArticleFromFormAndSave(@ModelAttribute("article") Article article, @RequestParam("image") MultipartFile imageData) {
+        try {
+            String fileName = StringUtils.cleanPath(imageData.getOriginalFilename());
+            Image image = new Image(fileName, imageData.getBytes());
+            imageService.save(image);
+            article.setImageId(image);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         User user = userService.getUserById(1L);
         articleService.saveArticleWithUser(article, user);
         return "redirect:/";

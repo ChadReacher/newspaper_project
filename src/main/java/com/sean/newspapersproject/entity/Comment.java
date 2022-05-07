@@ -19,16 +19,23 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User userId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "article_id")
+    private Article articleId;
+
     private String message;
     private LocalDateTime createdAt;
 
-    public Comment(User user, String message, LocalDateTime createdAt) {
-        this.userId = user;
+    public Comment(User userId, Article articleId, String message, LocalDateTime createdAt) {
+        this.userId = userId;
+        this.articleId = articleId;
         this.message = message;
         this.createdAt = createdAt;
     }
 
     public Comment() {
+
     }
 
     public Long getCommentId() {
@@ -45,6 +52,14 @@ public class Comment {
 
     public void setUserId(User userId) {
         this.userId = userId;
+    }
+
+    public Article getArticleId() {
+        return articleId;
+    }
+
+    public void setArticleId(Article articleId) {
+        this.articleId = articleId;
     }
 
     public String getMessage() {

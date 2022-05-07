@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Controller
@@ -36,9 +37,14 @@ public class AdminController {
     }
 
     @GetMapping("/articles")
-    public String getAllArticlesAdminPage(@RequestParam(required = false, name = "page", defaultValue = "1") Integer pageNumber,
+    public String getAllArticlesAdminPage(@RequestParam(required = false, name = "page", defaultValue = "1") String pN,
+                                          @RequestParam(required = false, name = "column") String sortColumn,
                                           Model model) {
+        Integer pageNumber = Integer.valueOf(pN);
         List<Article> allArticles = articleService.getArticlesPages(pageNumber);
+        if (sortColumn != null) {
+            allArticles = articleService.getArticlesPages(pageNumber, sortColumn);
+        }
         model.addAttribute("articles", allArticles);
         model.addAttribute("currentPageNumber", pageNumber);
         model.addAttribute("quantityOfPages", articleService.getAllArticles().size() / 10);
@@ -63,21 +69,6 @@ public class AdminController {
         magazineService.save(magazine);
         return "redirect:/admin/magazines";
     }
-
-//    @PostMapping("/magazines/update/{id}")
-//    public String createMagazineAdminPage(@PathVariable("id") Long id, @ModelAttribute("magazine") Magazine magazine) {
-//        Magazine magazineToUpdate = magazineService.getMagazineById(id);
-//        magazineToUpdate.setName(magazine.getName());
-//        magazineService.save(magazineToUpdate);
-//        return "redirect:/admin/magazines";
-//    }
-//
-//
-//    @PostMapping("/magazines/delete/{id}")
-//    public String deleteMagazineByIdAdmin(@PathVariable("id") Long id) {
-//        magazineService.delete(id);
-//        return "redirect:/admin/magazines";
-//    }
 
     @GetMapping("/users")
     public String getAllUserAdminpage(Model model) {

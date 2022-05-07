@@ -15,12 +15,25 @@ public class Magazine {
     private Long magazineId;
     private String name;
 
-    public Magazine(String name) {
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "image_id")
+    private Image imageId;
+
+    public Magazine(String name, Image imageId) {
         this.name = name;
+        this.imageId = imageId;
     }
 
     public Magazine() {
 
+    }
+
+    public Image getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(Image imageId) {
+        this.imageId = imageId;
     }
 
     public Long getMagazineId() {
