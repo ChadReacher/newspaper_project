@@ -32,7 +32,7 @@ class ArticleServiceTest {
 
     @Test
     public void testSavingArticle() {
-        User user = new User("username", "Bob", "Moskey", "username", "user@name.com");
+        User user = new User("username", "Bob", "Moskey", "username", "user@name.com", null, null);
         userService.save(user);
         Category category1 = new Category("Sport");
         categoryService.save(category1);

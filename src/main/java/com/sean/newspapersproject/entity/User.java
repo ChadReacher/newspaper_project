@@ -1,9 +1,9 @@
 package com.sean.newspapersproject.entity;
 
+import com.sean.newspapersproject.security.Role;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Entity
@@ -22,13 +22,12 @@ public class User {
     private String username;
     private String firstName;
     private String lastName;
-    @Size(min = 5, max = 30, message = "Password should be between 5 and 30 characters")
     private String password;
     @Email(message = "Email should be valid")
     @Column(unique = true)
     private String email;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "image_id")
     private Image imageId;
 
@@ -37,18 +36,30 @@ public class User {
     )
     @JoinTable(
             name = "user_magazine_map",
-            joinColumns = { @JoinColumn(name = "user_id")},
-            inverseJoinColumns = { @JoinColumn(name = "magazine_id")}
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "magazine_id")}
     )
     private Set<Magazine> followedMagazines;
 
-    public User(String username, String firstName, String lastName, String password, String email) {
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "role")
+    private Role role;
+
+    public User() {
+
+    }
+
+    public User(String username, String firstName, String lastName, String password, String email, Image imageId, Role role) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.email = email;
+        this.imageId = imageId;
+        this.role = role;
     }
+
+
 
     public Long getUserId() {
         return userId;
@@ -112,5 +123,26 @@ public class User {
 
     public void setFollowedMagazines(Set<Magazine> followedMagazines) {
         this.followedMagazines = followedMagazines;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", username='" + username + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", role=" + role +
+                '}';
     }
 }

@@ -1,17 +1,20 @@
 package com.sean.newspapersproject.controller;
 
 import com.sean.newspapersproject.entity.*;
+import com.sean.newspapersproject.security.config.BcryptPasswordEncoder;
+import com.sean.newspapersproject.security.SecurityUser;
 import com.sean.newspapersproject.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
@@ -27,23 +30,39 @@ public class MainController {
     private final UserService userService;
     private final MagazineService magazineService;
     private final ImageService imageService;
+    private final BcryptPasswordEncoder passwordEncoder;
 
     @Autowired
     public MainController(ArticleService articleService,
                           CategoryService categoryService,
                           UserService userService,
                           MagazineService magazineService,
-                          ImageService imageService) {
+                          ImageService imageService,
+                          BcryptPasswordEncoder passwordEncoder) {
         this.articleService = articleService;
         this.categoryService = categoryService;
         this.userService = userService;
         this.magazineService = magazineService;
         this.imageService = imageService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
     public String getMainPage(Model model) {
         List<Article> articles = articleService.getAllArticles().stream().limit(5).collect(Collectors.toList());
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication instanceof AnonymousAuthenticationToken) {
+            model.addAttribute("authenticated", "false");
+        } else {
+            model.addAttribute("authenticated", "true");
+            User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+            String imageString = Base64.getMimeEncoder().encodeToString(user.getImageId().getImageData());
+            model.addAttribute("imageString", imageString);
+        }
+
+
         model.addAttribute("articles", articles);
         return "main";
     }
@@ -140,4 +159,5 @@ public class MainController {
         magazineService.delete(id);
         return "redirect:/";
     }
+
 }

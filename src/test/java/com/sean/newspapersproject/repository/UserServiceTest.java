@@ -18,7 +18,7 @@ class UserServiceTest {
 
     @Test
     public void testSavingUser() {
-        User user = new User("admin2", "Admin", "Adminovish", "admin2", "admin2@admin.com");
+        User user = new User("admin2", "Admin", "Adminovish", "admin2", "admin2@admin.com", null, null);
         userService.save(user);
         String username = "admin2";
         User actualUser = userService.getUserByUsername(username);
@@ -27,11 +27,11 @@ class UserServiceTest {
 
     @Test
     public void testUpdatingUser() {
-        User user = new User("admin3","Admin", "Adminovish", "admin3", "admin3@admin.com");
+        User user = new User("admin3","Admin", "Adminovish", "admin3", "admin3@admin.com", null, null);
         userService.save(user);
         String username = "admin3";
         User actualUser = userService.getUserByUsername(username);
-        User updatedUser = new User("admin","Admin", "Adminovish", "admin", "admin@workout.com");
+        User updatedUser = new User("admin","Admin", "Adminovish", "admin", "admin@workout.com", null, null);
         userService.update(1L, updatedUser);
         actualUser = userService.getUserByUsername("admin");
         assertEquals("admin", actualUser.getUsername());

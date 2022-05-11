@@ -8,17 +8,18 @@ import com.sean.newspapersproject.service.CategoryService;
 import com.sean.newspapersproject.service.MagazineService;
 import com.sean.newspapersproject.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 @Controller
 @RequestMapping("/admin")
+@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 public class AdminController {
 
     @Autowired
@@ -71,14 +72,14 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public String getAllUserAdminpage(Model model) {
+    public String getAllUserAdminPage(Model model) {
         model.addAttribute("users", userService.getAllUsers());
         return "admin/admin_page_users";
     }
 
     @PostMapping("/users")
     public String deleteUserByIdAdmin(@RequestParam("userId") String id) {
-        userService.delete((Long.valueOf(Integer.parseInt(id))));
+        userService.delete(((long) Integer.parseInt(id)));
         return "redirect:/admin/users";
     }
 

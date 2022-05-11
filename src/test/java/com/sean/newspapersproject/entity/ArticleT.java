@@ -42,7 +42,7 @@ public class ArticleT {
     @Test
     public void testUserFieldGetter() {
         if (article.getUserId() != null) {
-            User user = new User("username", "Lada", "Sedan", "password", "user@usr.com");
+            User user = new User("username", "Lada", "Sedan", "password", "user@usr.com", null, null);
             assertEquals(user.getUsername(), article.getUserId().getUsername());
         }
     }
