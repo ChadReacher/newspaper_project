@@ -14,26 +14,16 @@ import java.util.Set;
 @Service
 public class ImageService {
 
-    private UserRepository userRepository;
-    private MagazineRepository magazineRepository;
-    private ArticleService articleService;
-    private CommentService commentService;
     private ImageRepository imageRepository;
 
     @Autowired
-    public ImageService(UserRepository userRepository, MagazineRepository magazineRepository, ArticleService articleService,
-                        CommentService commentService, ImageRepository imageRepository) {
-        this.userRepository = userRepository;
-        this.magazineRepository = magazineRepository;
-        this.articleService = articleService;
-        this.commentService = commentService;
-        this.imageRepository = imageRepository;
-    }
-
-
     public List<Image> getAllImages() {
         List<Image> images = imageRepository.findAll();
         return images;
+    }
+
+    public ImageService(ImageRepository imageRepository) {
+        this.imageRepository = imageRepository;
     }
 
     public Image getImageById(Long id) {

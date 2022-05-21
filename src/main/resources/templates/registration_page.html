@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-	<title>Sign up</title>
+	<title>Registration</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
@@ -13,7 +13,11 @@
 		<h1>Creative SignUp Form</h1>
 		<div class="main-agileinfo">
 			<div class="agileits-top">
+				<p style="margin-bottom: 28px;" th:text="${userExists}"></p>
+				<p style="margin-bottom: 28px;" th:text="${passwordsNotSame}"></p>
+				<p style="margin-bottom: 28px;" th:text="${userExistsWithEmail}"></p>
 				<form th:action="@{/register}" th:method="POST" enctype="multipart/form-data">
+					<p style="margin-bottom: 28px;"></p>
 					<input class="text" style="margin-bottom: 28px;" type="text" name="username" placeholder="Username" required="">
 					<input class="text" style="margin-bottom: 28px;" type="text" name="firstName" placeholder="First name" required="">
 					<input class="text" type="text" name="lastName" placeholder="Last name" required="">

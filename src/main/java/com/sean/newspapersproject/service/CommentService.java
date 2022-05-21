@@ -40,7 +40,7 @@ public class CommentService {
     }
 
     public List<Comment> getCommentsByUsername(String username) {
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).get();
         List<Comment> comments = commentRepository.findByUserId(user);
         return comments;
     }

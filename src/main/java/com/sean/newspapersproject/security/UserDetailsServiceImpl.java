@@ -3,6 +3,7 @@ package com.sean.newspapersproject.security;
 import com.sean.newspapersproject.entity.User;
 import com.sean.newspapersproject.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

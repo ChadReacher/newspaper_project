@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dashboard Template · Bootstrap v5.1</title>
+    <title>All users | Admin</title>
 
     <!-- Bootstrap core CSS -->
 <link href="https://getbootstrap.com/docs/5.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
@@ -33,32 +33,9 @@
 </head>
 
 <body>
-<!--    -->
-    <header class="p-3 mb-3">
-        <div class="container-fluid">
-          <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <a class="navbar-brand" href="/" style="color: green; ;">Online newspaper</a>
-            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-              <li><a href="#" class="nav-link px-2 link-secondary">Overview</a></li>
-              <li><a href="#" class="nav-link px-2 link-dark">Inventory</a></li>
-              <li><a href="#" class="nav-link px-2 link-dark">Customers</a></li>
-              <li><a href="#" class="nav-link px-2 link-dark">Products</a></li>
-            </ul>
 
-            <div class="dropdown text-end">
-              <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
-              </a>
-              <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1" style="">
-                <li><a class="dropdown-item" href="#">Profile</a></li>
-                <li><a class="dropdown-item" href="#">Settings</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item " href="#">Sign out</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-    </header>
+<header class="p-3 mb-3"  th:replace="fragments/header_authorized :: header_authorized">
+</header>
 
       <div class="container-fluid">
         <div class="row">
@@ -76,6 +53,12 @@
               </div>
             </div>
 
+
+
+            <!-- Modal -->
+
+
+
             <table class="table table-hover">
               <thead>
                 <tr>
@@ -83,6 +66,7 @@
                   <th scope="col">Username</th>
                   <th scope="col">First name</th>
                   <th scope="col">Last name</th>
+                  <th scope="col">Role</th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
@@ -90,10 +74,47 @@
                 <tr th:each="user : ${users}">
                   <th scope="row" th:text="${user.getUserId()}"></th>
                   <td th:text="${user.getUsername()}"></td>
-                  <td>Mark</td>
-                  <td>Otto</td>
+                  <td th:text="${user.getFirstName()}"></td>
+                  <td th:text="${user.getLastName()}"></td>
+                  <td th:text="${user.getRole().name()}"></td>
                   <td>
-                      <a class="btn btn-info btn-sm" style="margin-right: 10px;" href="">Edit</a>
+
+                    <button type="button" class="btn btn-info btn-sm" style="margin-right: 10px;" data-bs-toggle="modal" th:data-bs-target="'#exampleModal' + ${user.getUserId()}">
+                      Edit
+                    </button>
+
+
+                    <div class="modal fade" th:id="'exampleModal' + ${user.getUserId()}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Edit user</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <form th:method="POST" th:action="@{/admin/users/change-role}">
+                            <div class="modal-body">
+                              <div class="mb-3">
+                                <input type="text" name="username" class="form-control" th:value="${user.getUsername()}">
+                                <input type="text" name="firstName" class="form-control" th:value="${user.getFirstName()}">
+                                <input type="text" name="lastName" class="form-control" th:value="${user.getLastName()}">
+                                <input type="hidden" th:value="${user.getUserId()}" name="userId">
+                                <label for="formGroupSelect" class="form-label">Role</label>
+                                <select name="role" class="form-select" aria-label="Default select example" id="formGroupSelect">
+                                  <option>USER</option>
+                                  <option>ADMIN</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
+
                     <form th:method="POST" th:action="@{/admin/users/}" style="display: inline-block;">
                       <input type="submit" class="btn btn-danger btn-sm" value="Delete">
                       <input type="hidden" th:value="${user.getUserId()}" name="userId">
@@ -107,11 +128,7 @@
         </div>
       </div>
 
-      <!-- <script src="https://getbootstrap.com/docs/5.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-      <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script>
-      <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script>
-      <script src="https://getbootstrap.com/docs/5.1/examples/dashboard/dashboard.js"></script> -->
-
+      <script src="https://getbootstrap.com/docs/5.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 
 </body>
 </html>

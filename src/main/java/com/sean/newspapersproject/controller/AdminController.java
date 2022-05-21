@@ -3,6 +3,7 @@ package com.sean.newspapersproject.controller;
 import com.sean.newspapersproject.entity.Article;
 import com.sean.newspapersproject.entity.Category;
 import com.sean.newspapersproject.entity.Magazine;
+import com.sean.newspapersproject.entity.User;
 import com.sean.newspapersproject.service.ArticleService;
 import com.sean.newspapersproject.service.CategoryService;
 import com.sean.newspapersproject.service.MagazineService;
@@ -19,7 +20,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/admin")
-@PreAuthorize("hasAuthority('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     @Autowired
@@ -34,6 +35,7 @@ public class AdminController {
     @GetMapping
     public String getDashboardPage(Model model) {
         model.addAttribute("articles", articleService.getAllArticles());
+        ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
         return "admin/admin_page";
     }
 
@@ -41,6 +43,7 @@ public class AdminController {
     public String getAllArticlesAdminPage(@RequestParam(required = false, name = "page", defaultValue = "1") String pN,
                                           @RequestParam(required = false, name = "column") String sortColumn,
                                           Model model) {
+        ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
         Integer pageNumber = Integer.valueOf(pN);
         List<Article> allArticles = articleService.getArticlesPages(pageNumber);
         if (sortColumn != null) {
@@ -61,6 +64,7 @@ public class AdminController {
 
     @GetMapping("/magazines")
     public String getAllMagazinesAdminPage(Model model) {
+        ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
         model.addAttribute("magazines", magazineService.getAllMagazines());
         return "admin/admin_page_magazines";
     }
@@ -73,21 +77,40 @@ public class AdminController {
 
     @GetMapping("/users")
     public String getAllUserAdminPage(Model model) {
+        ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
         model.addAttribute("users", userService.getAllUsers());
         return "admin/admin_page_users";
     }
 
     @PostMapping("/users")
     public String deleteUserByIdAdmin(@RequestParam("userId") String id) {
-        userService.delete(((long) Integer.parseInt(id)));
+        userService.delete((long) Integer.parseInt(id));
+        return "redirect:/admin/users";
+    }
+
+    @PostMapping("/users/change-role")
+    public String updateUserRoleById(@RequestParam("userId") String userId, @RequestParam("role") String role,
+                                     @ModelAttribute("user") User updatedUser) {
+        User user = userService.getUserById(Long.valueOf(userId));
+        updatedUser.setEmail(user.getEmail());
+        updatedUser.setPassword(user.getPassword());
+        updatedUser.setRole(user.getRole());
+        userService.update(Long.valueOf(userId), updatedUser);
         return "redirect:/admin/users";
     }
 
 
     @GetMapping("/categories")
     public String getAllCategoriesAdminPage(Model model) {
+        ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
         model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("category", new Category());
+        Map<String, Integer> numberOfArticlesAccordingToCategory = getMapOfArticlesAndTheirViews();
+        model.addAttribute("map", numberOfArticlesAccordingToCategory);
+        return "admin/admin_page_categories";
+    }
+
+    public Map<String, Integer> getMapOfArticlesAndTheirViews() {
         Map<String, Integer> numberOfArticlesAccordingToCategory = new HashMap<>();
         for (Article article : articleService.getAllArticles()) {
             String categoryName = article.getCategory().getName();
@@ -98,8 +121,7 @@ public class AdminController {
                 numberOfArticlesAccordingToCategory.put(categoryName, 1);
             }
         }
-        model.addAttribute("map", numberOfArticlesAccordingToCategory);
-        return "admin/admin_page_categories";
+        return numberOfArticlesAccordingToCategory;
     }
 
     @PostMapping("/categories")
@@ -109,10 +131,8 @@ public class AdminController {
     }
 
     @PostMapping("/categories/edit/{id}")
-    public String saveCategoryAdmin(@PathVariable("id") Long id, @ModelAttribute("category") Category category) {
-        Category categoryToUpdate = categoryService.getCategoryById(id);
-        categoryToUpdate.setName(category.getName());
-        categoryService.save(categoryToUpdate);
+    public String saveCategoryAdmin(@PathVariable("id") Long id, @ModelAttribute("category") Category updateCategory) {
+        categoryService.update(id, updateCategory);
         return "redirect:/admin/categories";
     }
 

@@ -2,9 +2,11 @@ package com.sean.newspapersproject.service;
 
 import com.sean.newspapersproject.entity.Article;
 import com.sean.newspapersproject.entity.Category;
+import com.sean.newspapersproject.entity.Magazine;
 import com.sean.newspapersproject.entity.User;
 import com.sean.newspapersproject.repository.ArticleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -19,11 +21,13 @@ public class ArticleService {
 
     private ArticleRepository articleRepository;
     private CategoryService categoryService;
+    private MagazineService magazineService;
 
     @Autowired
-    public ArticleService(ArticleRepository articleRepository, CategoryService categoryService) {
+    public ArticleService(ArticleRepository articleRepository, CategoryService categoryService, @Lazy MagazineService magazineService) {
         this.articleRepository = articleRepository;
         this.categoryService = categoryService;
+        this.magazineService = magazineService;
     }
 
     public List<Article> getAllArticles() {
@@ -38,7 +42,6 @@ public class ArticleService {
 
     public List<Article> getArticlesPages(Integer pageNumber) {
         Pageable firstPageWithTenArticles = PageRequest.of(pageNumber - 1, 10);
-        Sort sort = firstPageWithTenArticles.getSort();
         List<Article> articles = articleRepository.findAll(firstPageWithTenArticles).toList();
         return articles;
     }
@@ -64,13 +67,9 @@ public class ArticleService {
         Category category = categoryService.getCategoryByName(article.getCategory().getName());
         article.setCategory(category);
         article.setCreatedAt(LocalDateTime.now());
-        if (user != null) {
-            article.setUserId(user);
-            article.setMagazine(null);
-        } else {
-            article.setUserId(null);
-            article.setMagazine(null);
-        }
+        article.setUserId(user);
+        Magazine magazine = magazineService.getMagazineByAuthor(user);
+        article.setMagazine(magazine);
         articleRepository.save(article);
     }
 
@@ -95,4 +94,8 @@ public class ArticleService {
         articleRepository.delete(article);
     }
 
+    public List<Article> getAllArticleByMagazine(Magazine magazine) {
+        List<Article> articlesFromMagazine = articleRepository.findAllByMagazine(magazine);
+        return articlesFromMagazine;
+    }
 }

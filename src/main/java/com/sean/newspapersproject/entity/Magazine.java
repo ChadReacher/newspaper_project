@@ -19,13 +19,26 @@ public class Magazine {
     @JoinColumn(name = "image_id")
     private Image imageId;
 
-    public Magazine(String name, Image imageId) {
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User author;
+
+    public Magazine(String name, Image imageId, User author) {
         this.name = name;
         this.imageId = imageId;
+        this.author = author;
     }
 
     public Magazine() {
 
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
     }
 
     public Image getImageId() {
@@ -50,5 +63,14 @@ public class Magazine {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Magazine{" +
+                "magazineId=" + magazineId +
+                ", name='" + name + '\'' +
+                ", author=" + author +
+                '}';
     }
 }

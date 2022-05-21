@@ -1,10 +1,12 @@
 package com.sean.newspapersproject.security.config;
 
 
+import com.sean.newspapersproject.security.Role;
 import com.sean.newspapersproject.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -33,7 +35,7 @@ public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/", "/article/**","/login", "/register", "/css/**", "/js/**", "/user/**").permitAll()
+                .antMatchers("/", "/article/**", "/magazine/**", "/user/**", "/login", "/register", "/css/**", "/js/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -45,8 +47,7 @@ public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
                     .invalidateHttpSession(true)
                     .clearAuthentication(true)
                     .deleteCookies("JSESSIONID")
-                    .logoutSuccessUrl("/login");
-
+                    .logoutSuccessUrl("/");
     }
 
     @Override
@@ -60,5 +61,11 @@ public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
         daoAuthenticationProvider.setPasswordEncoder(bcryptPasswordEncoder.passwordEncoder());
         return daoAuthenticationProvider;
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 }

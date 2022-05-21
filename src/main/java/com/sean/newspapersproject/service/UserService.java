@@ -19,17 +19,15 @@ import java.util.Set;
 public class UserService {
 
     private UserRepository userRepository;
-    private MagazineRepository magazineRepository;
     private ArticleService articleService;
     private CommentService commentService;
     private BcryptPasswordEncoder passwordEncoder;
 
 
     @Autowired
-    public UserService(UserRepository userRepository, MagazineRepository magazineRepository, ArticleService articleService,
+    public UserService(UserRepository userRepository, ArticleService articleService,
                        CommentService commentService, BcryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.magazineRepository = magazineRepository;
         this.articleService = articleService;
         this.commentService = commentService;
         this.passwordEncoder = passwordEncoder;
@@ -54,20 +52,28 @@ public class UserService {
     }
 
     public User getUserByUsername(String username) {
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElse(null);
         return user;
     }
 
     public void save(User user) {
         String encodedPassword = passwordEncoder.passwordEncoder().encode(user.getPassword());
         user.setPassword(encodedPassword);
-        user.setRole(Role.USER);
         userRepository.save(user);
     }
 
     @Transactional
     public void update(Long id, User updatedUser) {
+        User user = userRepository.findById(id).get();
+        if (updatedUser.getPassword().isEmpty() || updatedUser.getPassword().isBlank() || updatedUser.getPassword() == null) {
+            updatedUser.setPassword(user.getPassword());
+        } else {
+            String encodedPassword = passwordEncoder.passwordEncoder().encode(updatedUser.getPassword());
+            updatedUser.setPassword(encodedPassword);
+        }
+        updatedUser.setRole(user.getRole());
         userRepository.updateUserById(id, updatedUser);
+        userRepository.save(user);
     }
 
     @Transactional
@@ -82,5 +88,10 @@ public class UserService {
             commentService.delete(comment);
         }
         userRepository.deleteById(id);
+    }
+
+    public User getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email).orElse(null);
+        return user;
     }
 }

@@ -36,7 +36,7 @@ class ArticleServiceTest {
         userService.save(user);
         Category category1 = new Category("Sport");
         categoryService.save(category1);
-        Magazine magazine = new Magazine("Fashion Magazine", null);
+        Magazine magazine = new Magazine("Fashion Magazine", null, user);
         magazineService.save(magazine);
         Article article1 = new Article(
                 "New Article",

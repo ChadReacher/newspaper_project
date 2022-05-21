@@ -4,6 +4,8 @@ import com.sean.newspapersproject.security.Role;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Entity
@@ -23,7 +25,6 @@ public class User {
     private String firstName;
     private String lastName;
     private String password;
-    @Email(message = "Email should be valid")
     @Column(unique = true)
     private String email;
 

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Magazine Settings</title>
+
+    <!-- Bootstrap core CSS -->
+<link href="https://getbootstrap.com/docs/5.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+
+
+    <!-- Custom styles for this template -->
+<style type="text/css">
+    @keyframes chartjs-render-animation{from{opacity:.99}to{opacity:1}}.chartjs-render-monitor{animation:chartjs-render-animation 1ms}.chartjs-size-monitor,.chartjs-size-monitor-expand,.chartjs-size-monitor-shrink{position:absolute;direction:ltr;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1}.chartjs-size-monitor-expand>div{position:absolute;width:1000000px;height:1000000px;left:0;top:0}.chartjs-size-monitor-shrink>div{position:absolute;width:200%;height:200%;left:0;top:0}
+</style>
+</head>
+
+<body>
+
+<header class="p-3 mb-3"  th:replace="fragments/header_authorized :: header_authorized">
+</header>
+
+
+    <div class="container col-xxl-8">
+    <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+      <div class="col-10 col-sm-8 col-lg-6">
+        <img th:src="*{'data:image/png;base64,'+magazineImage}" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="700" height="500" loading="lazy">
+      </div>
+      <div class="col-lg-6">
+        <h1 class="display-5 fw-bold lh-1 mb-3" th:text="${magazine.getName()}"></h1>
+        <p class="lead">Quickly design and customize responsive mobile-first sites with Bootstrap, the world’s most popular front-end open source toolkit, featuring Sass variables and mixins, responsive grid system, extensive prebuilt components, and powerful JavaScript plugins.</p>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+              <a type="button" class="btn btn-success btn-lg px-4 me-md-2" th:href="@{/create-article}">Write an
+                  article</a>
+              <form th:action="@{/delete-magazine/{id}(id = ${magazine.getMagazineId()})}" th:method="POST">
+                  <button type="submit" class="btn btn-danger btn-lg px-4">Delete magazine</button>
+              </form>
+          </div>
+      </div>
+    </div>
+  </div>
+
+<div class="container col-xxl-8" style="margin-left: 34%">
+  <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+    <div class="col">
+      <h1 class="display-5 fw-bold lh-1 mb-3">Magazine's settings</h1>
+      <p class="lead">Here you can change some things in you magazine</p>
+        <form th:action="@{magazine/update}" th:method="POST" enctype="multipart/form-data">
+          <div class="mb-3" style="width: 50%;" >
+              <label for="input1" class="form-label">Change magazine title</label>
+              <input name="name" id="input1" class="form-control" type="text" th:value="${magazine.getName()}" aria-label="default input example">
+          </div>
+
+          <div class="input-group" style="width: 50%;">
+              <label class="input-group-text" for="inputGroupFile01">Upload new image</label>
+              <input name="imageData" type="file" class="form-control" id="inputGroupFile01">
+          </div>
+            <input class="btn btn-primary" type="submit" value="Submit form">
+        </form>
+    </div>
+  </div>
+</div>
+
+      <div class="container-fluid">
+        <div class="row" style="margin-right: 10%; margin-left: 10%;">
+          <main class="col">
+            <h2>Written articles</h2>
+
+            <div class="table-responsive">
+              <table class="table table-striped table-sm">
+                <thead>
+                  <tr>
+                    <th scope="col">Title</th>
+                    <th scope="col">Author</th>
+                    <th scope="col">Views</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="article : ${articlesFromMagazine}">
+                    <td>
+                        <a th:href="@{/article/{id}(id = ${article.getArticleId()})}" th:text="${article.getTitle()}"
+                        style="text-decoration: none; color: black"></a>
+                    </td>
+                    <td th:text="${article.getUserId().getUsername()}">data</td>
+                    <td>544</td>
+                    <td>
+                        <a th:href="@{/update-article/{id}(id = ${article.getArticleId()})}" class="btn btn-info btn-sm" style="margin-right: 10px;">Edit</a>
+                        <form style="display: inline-block;" th:action="@{delete-article/{id}(id =${article.getArticleId()})}" th:method="POST">
+                            <input type="submit" class="btn btn-danger btn-sm" value="Delete">
+                        </form>
+                    </td>
+
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </main>
+        </div>
+      </div>
+
+
+
+      <!-- <script src="https://getbootstrap.com/docs/5.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script>
+      <script src="https://getbootstrap.com/docs/5.1/examples/dashboard/dashboard.js"></script> -->
+
+
+</body>
+</html>

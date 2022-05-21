@@ -1,0 +1,46 @@
+package com.sean.newspapersproject.controller;
+
+import com.sean.newspapersproject.entity.Article;
+import com.sean.newspapersproject.entity.User;
+import com.sean.newspapersproject.security.SecurityUser;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ui.Model;
+
+import java.util.Base64;
+
+public class ImageAndModelSettings {
+
+    public static void updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication instanceof AnonymousAuthenticationToken) {
+            model.addAttribute("authenticated", "false");
+        } else {
+            model.addAttribute("authenticated", "true");
+            User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+            getImageStringFromUserAndPutInModel(user, model);
+        }
+    }
+
+    public static void getImageStringFromUserAndPutInModel(User user, Model model) {
+        try {
+            byte[] imageData = user.getImageId().getImageData();
+            String imageString = Base64.getMimeEncoder().encodeToString(user.getImageId().getImageData());
+            model.addAttribute("imageString", imageString);
+        } catch (Exception e) {
+            String imageString = "";
+            model.addAttribute("imageString", imageString);
+        }
+    }
+
+    public static void getImageStringFromArticleAndPutInModel(Article article, Model model) {
+        try {
+            String imageString = Base64.getMimeEncoder().encodeToString(article.getImageId().getImageData());
+            model.addAttribute("imageString", imageString);
+        } catch (Exception e) {
+            String imageString = "";
+            model.addAttribute("imageString", imageString);
+        }
+    }
+}

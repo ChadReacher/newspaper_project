@@ -2,6 +2,7 @@ package com.sean.newspapersproject.repository;
 
 import com.sean.newspapersproject.entity.Article;
 import com.sean.newspapersproject.entity.Comment;
+import com.sean.newspapersproject.entity.Magazine;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -28,6 +29,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
             nativeQuery = true
     )
     List<Article> findAllByUserId(@Param("id") Long id);
+
+    List<Article> findAllByMagazine(Magazine magazine);
 
     List<Article> findAllByTitle(String articleTitle);
 }
