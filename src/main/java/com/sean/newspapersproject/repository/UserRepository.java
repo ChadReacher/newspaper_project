@@ -1,5 +1,6 @@
 package com.sean.newspapersproject.repository;
 
+import com.sean.newspapersproject.entity.Magazine;
 import com.sean.newspapersproject.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -27,4 +29,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     void updateUserById(@Param("id") Long id, @Param("user") User updatedUser);
 
     Optional<User> findByEmail(String email);
+
 }

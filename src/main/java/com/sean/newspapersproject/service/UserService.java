@@ -21,16 +21,19 @@ public class UserService {
     private UserRepository userRepository;
     private ArticleService articleService;
     private CommentService commentService;
+    private MagazineService magazineService;
     private BcryptPasswordEncoder passwordEncoder;
 
 
     @Autowired
     public UserService(UserRepository userRepository, ArticleService articleService,
-                       CommentService commentService, BcryptPasswordEncoder passwordEncoder) {
+                       CommentService commentService, BcryptPasswordEncoder passwordEncoder,
+                       MagazineService magazineService) {
         this.userRepository = userRepository;
         this.articleService = articleService;
         this.commentService = commentService;
         this.passwordEncoder = passwordEncoder;
+        this.magazineService = magazineService;
     }
 
 
@@ -57,23 +60,30 @@ public class UserService {
     }
 
     public void save(User user) {
-        String encodedPassword = passwordEncoder.passwordEncoder().encode(user.getPassword());
-        user.setPassword(encodedPassword);
+        if (!user.getPassword().startsWith("$2a$10$")) {
+            String encodedPassword = passwordEncoder.passwordEncoder().encode(user.getPassword());
+            user.setPassword(encodedPassword);
+        }
         userRepository.save(user);
     }
 
     @Transactional
     public void update(Long id, User updatedUser) {
-        User user = userRepository.findById(id).get();
-        if (updatedUser.getPassword().isEmpty() || updatedUser.getPassword().isBlank() || updatedUser.getPassword() == null) {
-            updatedUser.setPassword(user.getPassword());
+        User userToUpdate = getUserById(id);
+        if (updatedUser.getEmail() == null) {
+            updatedUser.setEmail(userToUpdate.getEmail());
+        }
+        if (updatedUser.getRole() == null) {
+            updatedUser.setRole(userToUpdate.getRole());
+        }
+        if (updatedUser.getPassword() == null || updatedUser.getPassword().isEmpty() || updatedUser.getPassword().isBlank()) {
+            updatedUser.setPassword(userToUpdate.getPassword());
         } else {
             String encodedPassword = passwordEncoder.passwordEncoder().encode(updatedUser.getPassword());
             updatedUser.setPassword(encodedPassword);
         }
-        updatedUser.setRole(user.getRole());
         userRepository.updateUserById(id, updatedUser);
-        userRepository.save(user);
+        userRepository.save(userToUpdate);
     }
 
     @Transactional
@@ -83,15 +93,25 @@ public class UserService {
         for (Article article : articles) {
             articleService.delete(article);
         }
-
         for (Comment comment : comments) {
             commentService.delete(comment);
         }
+
+        Magazine magazineByAuthor = magazineService.getMagazineByAuthor(getUserById(id));
+        magazineService.delete(magazineByAuthor.getMagazineId());
         userRepository.deleteById(id);
     }
 
     public User getUserByEmail(String email) {
         User user = userRepository.findByEmail(email).orElse(null);
         return user;
+    }
+
+    public boolean isUserWithUsernameExists(String username) {
+        return userRepository.findByUsername(username).orElse(null) == null;
+    }
+
+    public boolean isUserWithEmailExists(String email) {
+        return userRepository.findByEmail(email).orElse(null) == null;
     }
 }

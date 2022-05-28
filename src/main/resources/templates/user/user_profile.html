@@ -128,13 +128,15 @@
                     <div class="card-body">
                       <h6 class="d-flex align-items-center mb-3">My followed magazines:</h6>
                       <ul class="list-group">
-                          <li class="list-group-item">NewsTime
-                              <button type="submit" class="btn btn-primary" style="font-size: 1vw; float: right;">Unfollow</button>
+                          <li class="list-group-item" th:each="magazine : ${followedMagazines}">
+                              <a th:href="@{/magazine/{id}(id = ${magazine.getMagazineId()})}" th:text="${magazine.getName()}"
+                              style="text-decoration: none; color: black;"></a>
+                              <form th:action="@{/user/unfollow-magazine/{id}(id = ${magazine.getMagazineId()})}" th:method = "POST">
+                                  <button type="submit" class="btn btn-primary" style="font-size: 1vw; float: right;">
+                                      Unfollow
+                                  </button>
+                              </form>
                           </li>
-                          <li class="list-group-item">Dapibus ac facilisis in</li>
-                          <li class="list-group-item">Morbi leo risus</li>
-                          <li class="list-group-item">Porta ac consectetur ac</li>
-                          <li class="list-group-item">Vestibulum at eros</li>
                           <nav aria-label="Page navigation example" style = "margin-left: 20%; margin-top: 2%;">
                             <ul class="pagination">
                               <li class="page-item"><a class="page-link" href="#">Previous</a></li>

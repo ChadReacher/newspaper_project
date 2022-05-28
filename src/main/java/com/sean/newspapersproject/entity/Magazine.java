@@ -1,6 +1,7 @@
 package com.sean.newspapersproject.entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Magazine {
@@ -19,7 +20,7 @@ public class Magazine {
     @JoinColumn(name = "image_id")
     private Image imageId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User author;
 
@@ -70,7 +71,20 @@ public class Magazine {
         return "Magazine{" +
                 "magazineId=" + magazineId +
                 ", name='" + name + '\'' +
-                ", author=" + author +
+                ", author=" + author.getUsername() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Magazine magazine = (Magazine) o;
+        return Objects.equals(name, magazine.name) && Objects.equals(author, magazine.author);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, imageId, author);
     }
 }

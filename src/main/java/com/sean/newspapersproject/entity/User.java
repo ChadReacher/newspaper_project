@@ -1,11 +1,13 @@
 package com.sean.newspapersproject.entity;
 
 import com.sean.newspapersproject.security.Role;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -33,7 +35,8 @@ public class User {
     private Image imageId;
 
     @ManyToMany(
-            cascade = CascadeType.ALL
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER
     )
     @JoinTable(
             name = "user_magazine_map",
@@ -126,6 +129,14 @@ public class User {
         this.followedMagazines = followedMagazines;
     }
 
+    public void followMagazine(Magazine magazine) {
+        this.followedMagazines.add(magazine);
+    }
+
+    public void unfollowMagazine(Magazine magazine) {
+        this.followedMagazines.remove(magazine);
+    }
+
     public Role getRole() {
         return role;
     }
@@ -145,5 +156,21 @@ public class User {
                 ", email='" + email + '\'' +
                 ", role=" + role +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(userId, user.userId) && Objects.equals(username, user.username)
+                && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName)
+                && Objects.equals(password, user.password) && Objects.equals(email, user.email)
+                && Objects.equals(followedMagazines, user.followedMagazines) && role == user.role;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, username, firstName, lastName, password, email, followedMagazines, role);
     }
 }

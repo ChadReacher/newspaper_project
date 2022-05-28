@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title th:text="${article.getTitle()}"></title>
+    <link th:href="@{/css/single_article.css}"  rel="stylesheet" />
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light"  th:replace="fragments/header_unauthorized :: header_unauthorized">
+  </nav>
+
+  <header class="p-3 mb-3"  th:replace="fragments/header_authorized :: header_authorized">
+  </header>
+
+
+    <main class="container" style = "padding-left: 25%; text-align: center;">
+        <div class="row g-5">
+          <div class="col-md-8">
+            <article class="blog-post">
+                <h2 class="blog-post-title" style = "" th:text="${article.getTitle()}">
+                </h2>
+                <span class="badge badge-pill badge-info" style = "background: black; font-size: 1vw;" th:text="${article.getCategory().getName()}">
+                </span>
+                <p class="blog-post-meta" th:text="'Created at ' + ${article.getCreatedAt().format(dateTimeFormatter)}"></p>
+                <a style="display: block; text-decoration: none; color: black; margin-bottom: 5px;"
+                   th:text="'Author - ' + ${article.getUserId().getUsername()}"
+                   th:href="@{/user/{id}(id = ${article.getUserId().getUserId()})}"></a>
+                <a style="display: block; text-decoration: none; color: black; margin-bottom: 5px;"
+                   th:text="'Magazine - ' + ${article.getMagazine().getName()}"
+                   th:href="@{/magazine/{id}(id = ${article.getMagazine().getMagazineId()})}"></a>
+                <img style="border-radius: 8px; height: 40%; width: 40%;" th:src="*{'data:image/png;base64,'+imageString}" alt="" />
+              <h4>Some description:</h4>
+              <p th:text="${article.getDescription()}"></p>
+              <h4>Text:</h4>
+              <p th:text="${article.getText()}"></p>
+            </article>
+          </div>
+        </div>
+    </main>
+
+
+
+<div class="container">
+    <div class="be-comment-block">
+    	<h1 class="comments-title" th:text="'Comments ' + ${comments.size()}">Comments (x)</h1>
+
+    	<div class="be-comment" th:each="comment : ${comments}">
+    		<div class="be-img-comment">
+    			<a th:href="@{/user/{id}(id = ${comment.getUserId().getUserId()})}">
+                    <img th:src="*{'data:image/png;base64,'} + ${ mapOfUsersImagesInComments.get(comment) }" alt="" class="be-ava-comment">
+    			</a>
+    		</div>
+    		<div class="be-comment-content">
+    				<span class="be-comment-name">
+    					<a th:href="@{/user/{id}(id = ${comment.getUserId().getUserId()})}" th:text="${comment.getUserId().getUsername()}">Ravi Sah</a>
+					</span>
+    				<span class="be-comment-time" th:text="${comment.getCreatedAt().format(dateTimeFormatter)}">
+    					<i class="fa fa-clock-o"></i>
+    					May 27, 2015 at 3:14am
+    				</span>
+    			<p class="be-comment-text" th:text="${comment.getMessage()}">
+    				Pellentesque gravida tristique ultrices.
+    				Sed blandit varius mauris, vel volutpat urna hendrerit id.
+    				Curabitur rutrum dolor gravida turpis tristique efficitur.
+    			</p>
+    		</div>
+    	</div>
+
+		<div class="container" style="width: 50%;" th:if="${authenticated}">
+			<form th:action="@{/article/{id}/comment(id=${article.getArticleId()})}" th:method="POST">
+				<div class="form-floating">
+					<textarea class="form-control" name="message" placeholder="Leave a comment here" id="floatingTextarea2"
+							  style="height: 100px"></textarea>
+					<label for="floatingTextarea2">Comments</label>
+				</div>
+				<div class="col-12 mt-3">
+					<button class="btn btn-primary" type="submit">Submit form</button>
+				</div>
+			</form>
+		</div>
+    </div>
+</div>
+
+
+  <script src="https://getbootstrap.com/docs/5.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+</body>
+</html>

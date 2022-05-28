@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://thymeleaf.org ">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>Error</title>
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light"  th:replace="fragments/header_unauthorized :: header_unauthorized">
+</nav>
+
+<header class="p-3 mb-3"  th:replace="fragments/header_authorized :: header_authorized">
+</header>
+
+
+<div class="container my-5">
+    <div class="bg-light p-5 rounded">
+        <div class="col-sm-8 py-5 mx-auto">
+            <h1 class="display-5 fw-normal">Sorry, but cannot find the thing that you want.</h1>
+            <p class="fs-5">Some text</p>
+            <p>
+                <a class="btn btn-primary" th:href="@{/}" role="button">Go to main page</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script src="https://getbootstrap.com/docs/5.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+</body>
+</html>

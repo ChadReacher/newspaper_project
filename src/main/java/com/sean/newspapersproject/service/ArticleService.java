@@ -1,9 +1,6 @@
 package com.sean.newspapersproject.service;
 
-import com.sean.newspapersproject.entity.Article;
-import com.sean.newspapersproject.entity.Category;
-import com.sean.newspapersproject.entity.Magazine;
-import com.sean.newspapersproject.entity.User;
+import com.sean.newspapersproject.entity.*;
 import com.sean.newspapersproject.repository.ArticleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -22,12 +19,15 @@ public class ArticleService {
     private ArticleRepository articleRepository;
     private CategoryService categoryService;
     private MagazineService magazineService;
+    private CommentService commentService;
 
     @Autowired
-    public ArticleService(ArticleRepository articleRepository, CategoryService categoryService, @Lazy MagazineService magazineService) {
+    public ArticleService(ArticleRepository articleRepository, CategoryService categoryService, @Lazy MagazineService magazineService,
+                          @Lazy CommentService commentService) {
         this.articleRepository = articleRepository;
         this.categoryService = categoryService;
         this.magazineService = magazineService;
+        this.commentService = commentService;
     }
 
     public List<Article> getAllArticles() {
@@ -81,11 +81,17 @@ public class ArticleService {
     public void update(Long id, Article updatedArticle) {
         Article articleToUpdate = getArticleById(id);
         articleRepository.updateArticleById(id, updatedArticle);
+        articleToUpdate.setImageId(updatedArticle.getImageId());
         articleRepository.save(articleToUpdate);
     }
 
     @Transactional
     public void delete(Long id) {
+        Article article = getArticleById(id);
+        List<Comment> comments = commentService.getCommentsByArticle(article);
+        for (Comment comment : comments) {
+            commentService.delete(comment);
+        }
         articleRepository.deleteById(id);
     }
 

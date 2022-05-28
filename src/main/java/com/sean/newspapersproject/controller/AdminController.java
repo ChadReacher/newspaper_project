@@ -1,19 +1,18 @@
 package com.sean.newspapersproject.controller;
 
-import com.sean.newspapersproject.entity.Article;
-import com.sean.newspapersproject.entity.Category;
-import com.sean.newspapersproject.entity.Magazine;
-import com.sean.newspapersproject.entity.User;
-import com.sean.newspapersproject.service.ArticleService;
-import com.sean.newspapersproject.service.CategoryService;
-import com.sean.newspapersproject.service.MagazineService;
-import com.sean.newspapersproject.service.UserService;
+import com.sean.newspapersproject.configs.ImageAndModelSettings;
+import com.sean.newspapersproject.entity.*;
+import com.sean.newspapersproject.security.Role;
+import com.sean.newspapersproject.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,14 +22,21 @@ import java.util.Map;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
-    @Autowired
     private ArticleService articleService;
-    @Autowired
     private MagazineService magazineService;
-    @Autowired
     private UserService userService;
-    @Autowired
     private CategoryService categoryService;
+    private ImageService imageService;
+
+    @Autowired
+    public AdminController(ArticleService articleService, MagazineService magazineService, UserService userService,
+                           CategoryService categoryService, ImageService imageService) {
+        this.articleService = articleService;
+        this.magazineService = magazineService;
+        this.userService = userService;
+        this.categoryService = categoryService;
+        this.imageService = imageService;
+    }
 
     @GetMapping
     public String getDashboardPage(Model model) {
@@ -58,7 +64,7 @@ public class AdminController {
 
     @PostMapping("/articles")
     public String deleteArticleByIdAdmin(@RequestParam("articleId") String id) {
-        articleService.delete((Long.valueOf(Integer.parseInt(id))));
+        articleService.delete(Long.valueOf(Integer.parseInt(id)));
         return "redirect:/admin/articles";
     }
 
@@ -66,11 +72,17 @@ public class AdminController {
     public String getAllMagazinesAdminPage(Model model) {
         ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
         model.addAttribute("magazines", magazineService.getAllMagazines());
+        Map<Magazine, Integer> numberOfPublishedArticlesByMagazine = new HashMap<>();
+        for (Magazine m : magazineService.getAllMagazines()) {
+            List<Article> articles = articleService.getAllArticleByMagazine(m);
+            numberOfPublishedArticlesByMagazine.put(m, articles.size());
+        }
+        model.addAttribute("numberOfPublishedArticlesByMagazine", numberOfPublishedArticlesByMagazine);
         return "admin/admin_page_magazines";
     }
 
     @PostMapping("/magazines")
-    public String createMagazineAdminPage(@ModelAttribute("magazine") Magazine magazine) {
+    public String createMagazineAdmin(@ModelAttribute("magazine") Magazine magazine) {
         magazineService.save(magazine);
         return "redirect:/admin/magazines";
     }
@@ -79,6 +91,12 @@ public class AdminController {
     public String getAllUserAdminPage(Model model) {
         ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
         model.addAttribute("users", userService.getAllUsers());
+        Map<User, Magazine> mapOfUsersAndTheirMagazine = new HashMap<>();
+        for (User user : userService.getAllUsers()) {
+            Magazine magazine = magazineService.getMagazineByAuthor(user);
+            mapOfUsersAndTheirMagazine.put(user, magazine);
+        }
+        model.addAttribute("mapOfUsersAndTheirMagazine", mapOfUsersAndTheirMagazine);
         return "admin/admin_page_users";
     }
 
@@ -91,10 +109,7 @@ public class AdminController {
     @PostMapping("/users/change-role")
     public String updateUserRoleById(@RequestParam("userId") String userId, @RequestParam("role") String role,
                                      @ModelAttribute("user") User updatedUser) {
-        User user = userService.getUserById(Long.valueOf(userId));
-        updatedUser.setEmail(user.getEmail());
-        updatedUser.setPassword(user.getPassword());
-        updatedUser.setRole(user.getRole());
+        updatedUser.setRole(Role.valueOf(role));
         userService.update(Long.valueOf(userId), updatedUser);
         return "redirect:/admin/users";
     }
@@ -140,5 +155,28 @@ public class AdminController {
     public String deleteCategoryAdmin(@PathVariable("id") Long id) {
         categoryService.delete(id);
         return "redirect:/admin/categories";
+    }
+
+    @PostMapping("magazine-update/{id}")
+    public String updateMagazine(@PathVariable("id") Long id, @ModelAttribute("magazine") Magazine updatedMagazine,
+                                 @RequestParam("imageData") MultipartFile imageData) {
+        saveImageAndSetToMagazine(imageData, updatedMagazine);
+        magazineService.update(id, updatedMagazine);
+        return "redirect:/";
+    }
+
+    public void saveImageAndSetToMagazine(MultipartFile imageData, Magazine magazine) {
+        try {
+            String fileName = StringUtils.cleanPath(imageData.getOriginalFilename());
+            if (fileName.isEmpty()) {
+                magazine.setImageId(null);
+            } else {
+                Image image = new Image(fileName, imageData.getBytes());
+                imageService.save(image);
+                magazine.setImageId(image);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

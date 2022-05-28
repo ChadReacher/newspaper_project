@@ -1,6 +1,7 @@
-package com.sean.newspapersproject.controller;
+package com.sean.newspapersproject.configs;
 
 import com.sean.newspapersproject.entity.Article;
+import com.sean.newspapersproject.entity.Magazine;
 import com.sean.newspapersproject.entity.User;
 import com.sean.newspapersproject.security.SecurityUser;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -25,7 +26,6 @@ public class ImageAndModelSettings {
 
     public static void getImageStringFromUserAndPutInModel(User user, Model model) {
         try {
-            byte[] imageData = user.getImageId().getImageData();
             String imageString = Base64.getMimeEncoder().encodeToString(user.getImageId().getImageData());
             model.addAttribute("imageString", imageString);
         } catch (Exception e) {
@@ -41,6 +41,16 @@ public class ImageAndModelSettings {
         } catch (Exception e) {
             String imageString = "";
             model.addAttribute("imageString", imageString);
+        }
+    }
+
+    public static void getImageStringFromMagazineAndPutInModel(Magazine authenticatedUsersMagazine, Model model) {
+        try {
+            String imageString = Base64.getMimeEncoder().encodeToString(authenticatedUsersMagazine.getImageId().getImageData());
+            model.addAttribute("magazineImage", imageString);
+        } catch (Exception e) {
+            String imageString = "";
+            model.addAttribute("magazineImage", imageString);
         }
     }
 }

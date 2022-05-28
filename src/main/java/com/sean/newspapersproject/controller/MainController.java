@@ -1,22 +1,19 @@
 package com.sean.newspapersproject.controller;
 
+import com.sean.newspapersproject.configs.ImageAndModelSettings;
 import com.sean.newspapersproject.entity.*;
-import com.sean.newspapersproject.security.SecurityUser;
 import com.sean.newspapersproject.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 
-import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -42,178 +39,65 @@ public class MainController {
 
     @GetMapping
     public String getMainPage(Model model) {
-        List<Article> articles = articleService.getAllArticles().stream().limit(5).collect(Collectors.toList());
+        List<Article> articles = articleService.getAllArticles().stream().skip(1).limit(5).collect(Collectors.toList());
+        Article firstArticle = articleService.getAllArticles().get(0);
+        model.addAttribute("firstArticle", firstArticle);
+        initializeMapOfArticleImagesAndSetToModel(articles, model);
         ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
+        String dateTimeFormatterPattern = "yyyy-MM-dd HH:mm:ss";
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimeFormatterPattern);
+        model.addAttribute("dateTimeFormatter", dateTimeFormatter);
         model.addAttribute("articles", articles);
         return "main";
     }
 
-    @GetMapping("article/{id}")
-    public String getArticleByIdPage(@PathVariable("id") Long id, Model model) {
-        Article article = articleService.getArticleById(id);
+    @GetMapping("articles")
+    public String getAllArticlesPage(Model model) {
+        List<Article> articles = articleService.getAllArticles();
+        model.addAttribute("articles", articles);
         ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
-        ImageAndModelSettings.getImageStringFromArticleAndPutInModel(article, model);
-        model.addAttribute("article", article);
-        return "single_article";
+        String dateTimeFormatterPattern = "yyyy-MM-dd HH:mm:ss";
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimeFormatterPattern);
+        model.addAttribute("dateTimeFormatter", dateTimeFormatter);
+        initializeMapOfArticleImagesAndSetToModel(articles, model);
+        return "articles";
     }
 
-    @GetMapping("create-article")
-    public String getArticleCreationPage(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        Magazine magazine = magazineService.getMagazineByAuthor(user);
-        if (magazine == null) {
-            return "redirect:/";
-        }
+    @GetMapping("magazines")
+    public String getAllMagazinesPage(Model model) {
+        List<Magazine> magazines = magazineService.getAllMagazines();
+        model.addAttribute("magazines", magazines);
         ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
-        List<Category> categories = categoryService.getAllCategories();
-        model.addAttribute("categories", categories);
-        model.addAttribute("article", new Article());
-        return "create_article";
+        initializeMapOfMagazineImagesAndSetToModel(magazines, model);
+        return "magazines";
     }
 
-
-    @PostMapping("create-article")
-    public String saveArticleWithForm(@ModelAttribute("article") Article updatedArticle,
-                                            @RequestParam("image") MultipartFile imageData) {
-        saveImageAndSetToArticle(imageData, updatedArticle);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        articleService.saveArticleWithUser(updatedArticle, user);
-        return "redirect:/";
-    }
-
-    public void saveImageAndSetToArticle(MultipartFile imageData, Article article) {
-        try {
-            String fileName = StringUtils.cleanPath(imageData.getOriginalFilename());
-            if (fileName.isEmpty()) {
-                article.setImageId(null);
-            } else {
-                Image image = new Image(fileName, imageData.getBytes());
-                imageService.save(image);
-                article.setImageId(image);
+    public void initializeMapOfArticleImagesAndSetToModel(List<Article> articles, Model model) {
+        Map<Article, String> mapOfArticleAndItsImage = new HashMap<>();
+        for (Article article : articles) {
+            try {
+                String imageString = Base64.getMimeEncoder().encodeToString(article.getImageId().getImageData());
+                mapOfArticleAndItsImage.put(article, imageString);
+            } catch (Exception e) {
+                String imageString = "";
+                mapOfArticleAndItsImage.put(article, imageString);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        model.addAttribute("mapOfArticleAndItsImage", mapOfArticleAndItsImage);
     }
 
-    @GetMapping("update-article/{id}")
-    public String getUpdateArticleByIdPage(@PathVariable("id") Long id, Model model) {
-        Article articleToUpdate = articleService.getArticleById(id);
-        ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
-        model.addAttribute("article", articleToUpdate);
-        return "update_article";
-    }
-
-    @PostMapping("update-article/{id}")
-    public String updateArticleById(@PathVariable("id") Long id, @ModelAttribute("article") Article updatedArticle) {
-        articleService.update(id, updatedArticle);
-        return "redirect:/";
-    }
-
-
-    @PostMapping("delete-article/{id}")
-    public String deleteArticleById(@PathVariable("id") Long id) {
-        articleService.delete(id);
-        return "redirect:/";
-    }
-
-
-    @GetMapping("magazine/{id}")
-    public String getMagazineByIdPage(@PathVariable("id") Long id, Model model) {
-        ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
-        Magazine magazine = magazineService.getMagazineById(id);
-        model.addAttribute("magazine", magazine);
-        return "magazine/single_magazine";
-    }
-
-    @GetMapping("create-magazine")
-    public String getMagazineCreationPage(Model model) {
-        model.addAttribute("magazine", new Magazine());
-        return "magazine/create_magazine";
-    }
-
-    @PostMapping("create-magazine")
-    public String createMagazine(@ModelAttribute("magazine") Magazine magazine, @RequestParam("imageData") MultipartFile imageData) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        magazine.setAuthor(user);
-        saveImageAndSetToMagazine(imageData, magazine);
-        magazineService.save(magazine);
-        return "redirect:/magazine";
-    }
-
-    public void saveImageAndSetToMagazine(MultipartFile imageData, Magazine magazine) {
-        try {
-            String fileName = StringUtils.cleanPath(imageData.getOriginalFilename());
-            if (fileName.isEmpty()) {
-                magazine.setImageId(null);
-            } else {
-                Image image = new Image(fileName, imageData.getBytes());
-                imageService.save(image);
-                magazine.setImageId(image);
+    public void initializeMapOfMagazineImagesAndSetToModel(List<Magazine> magazines, Model model) {
+        Map<Magazine, String> mapOfMagazineAndItsImage = new HashMap<>();
+        for (Magazine magazine : magazines) {
+            try {
+                String imageString = Base64.getMimeEncoder().encodeToString(magazine.getImageId().getImageData());
+                mapOfMagazineAndItsImage.put(magazine, imageString);
+            } catch (Exception e) {
+                String imageString = "";
+                mapOfMagazineAndItsImage.put(magazine, imageString);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        model.addAttribute("mapOfMagazineAndItsImage", mapOfMagazineAndItsImage);
     }
 
-    @GetMapping("magazine-update/{id}")
-    public String getUpdateMagazinePage(@PathVariable("id") Long id, Model model) {
-        ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
-        Magazine magazineToUpdate = magazineService.getMagazineById(id);
-        model.addAttribute("magazine", magazineToUpdate);
-        return "magazine/edit_magazine";
-    }
-
-    @PostMapping("magazine-update/{id}")
-    public String updateMagazine(@PathVariable("id") Long id, @ModelAttribute("magazine") Magazine updatedMagazine) {
-        Magazine magazineToUpdate = magazineService.getMagazineById(id);
-        magazineToUpdate.setName(updatedMagazine.getName());
-        magazineService.save(magazineToUpdate);
-        return "redirect:/";
-    }
-
-    @PostMapping("delete-magazine/{id}")
-    public String deleteMagazineById(@PathVariable("id") Long id) {
-        magazineService.delete(id);
-        return "redirect:/";
-    }
-
-    @GetMapping("magazine")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public String getMagazinePageFromAuthenticatedUser(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        Magazine magazine = magazineService.getMagazineByAuthor(user);
-        if (magazine == null) {
-            return "redirect:/";
-        }
-        try {
-            String imageString = Base64.getMimeEncoder().encodeToString(magazine.getImageId().getImageData());
-            model.addAttribute("magazineImage", imageString);
-        } catch (Exception e) {
-            String imageString = "";
-            model.addAttribute("magazineImage", imageString);
-        }
-        model.addAttribute("magazine", magazine);
-        ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
-        List<Article> articlesFromMagazine = articleService.getAllArticleByMagazine(magazine);
-        model.addAttribute("articlesFromMagazine", articlesFromMagazine);
-        return "magazine/magazine_managing";
-    }
-
-    @PostMapping("magazine/update")
-    public String updateAuthenticatedUsersMagazine(@ModelAttribute("magazine") Magazine updatedMagazine,
-                                                   @RequestParam("imageData") MultipartFile imageData) {
-        if (imageData != null) {
-            saveImageAndSetToMagazine(imageData, updatedMagazine);
-        }
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        Magazine magazine = magazineService.getMagazineByAuthor(user);
-        magazineService.update(magazine.getMagazineId(), updatedMagazine);
-        return "redirect:/magazine";
-    }
 }

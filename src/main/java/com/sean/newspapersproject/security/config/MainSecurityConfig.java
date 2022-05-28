@@ -35,19 +35,22 @@ public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/", "/article/**", "/magazine/**", "/user/**", "/login", "/register", "/css/**", "/js/**").permitAll()
+                .antMatchers("/", "/article/**", "/articles/**", "/magazines/**", "/magazine/**", "/user/**", "/css/**", "/js/**").permitAll()
+                .antMatchers("/login", "/register").anonymous()
                 .anyRequest()
                 .authenticated()
                 .and()
                     .formLogin()
-                    .loginPage("/login").permitAll()
+                    .loginPage("/login")
                 .and()
                 .logout()
                     .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
                     .invalidateHttpSession(true)
                     .clearAuthentication(true)
                     .deleteCookies("JSESSIONID")
-                    .logoutSuccessUrl("/");
+                    .logoutSuccessUrl("/")
+                .and()
+                .exceptionHandling().accessDeniedPage("/");
     }
 
     @Override

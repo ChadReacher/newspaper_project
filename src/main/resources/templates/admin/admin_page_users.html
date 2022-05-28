@@ -67,16 +67,23 @@
                   <th scope="col">First name</th>
                   <th scope="col">Last name</th>
                   <th scope="col">Role</th>
+                  <th scope="col">Magazine</th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <tr th:each="user : ${users}">
                   <th scope="row" th:text="${user.getUserId()}"></th>
-                  <td th:text="${user.getUsername()}"></td>
+                  <td>
+                    <a th:href="@{/user/{id}(id = ${user.getUserId()})}" th:text="${user.getUsername()}" style="text-decoration: none; color: black;"></a>
+                  </td>
                   <td th:text="${user.getFirstName()}"></td>
                   <td th:text="${user.getLastName()}"></td>
                   <td th:text="${user.getRole().name()}"></td>
+                  <td>
+                    <a th:href="@{/magazine/{id} (id = ${mapOfUsersAndTheirMagazine.get(user).getMagazineId()})}" th:if="${mapOfUsersAndTheirMagazine.get(user) != null}" th:text="${mapOfUsersAndTheirMagazine.get(user).getName()}" style="text-decoration: none; color: black;"></a>
+                    <a th:unless="${mapOfUsersAndTheirMagazine.get(user) != null}" th:text="'does not have magazine'" style="text-decoration: none; color: black;"></a>
+                  </td>
                   <td>
 
                     <button type="button" class="btn btn-info btn-sm" style="margin-right: 10px;" data-bs-toggle="modal" th:data-bs-target="'#exampleModal' + ${user.getUserId()}">
