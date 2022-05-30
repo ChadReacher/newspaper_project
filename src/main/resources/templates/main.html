@@ -34,6 +34,11 @@
 <header class="p-3 mb-3"  th:replace="fragments/header_authorized :: header_authorized">
 </header>
 
+<div th:if="${accessDenied}" class="alert alert-warning alert-dismissible fade show" role="alert">
+    <p th:text="${accessDenied}"></p>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
 
 <main class="container">
     <div class="p-4 p-md-5 mb-4 text-white rounded bg-dark"
