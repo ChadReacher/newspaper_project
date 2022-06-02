@@ -35,7 +35,6 @@ class UserServiceTest {
         userService.update(1L, updatedUser);
         actualUser = userService.getUserByUsername("admin");
         assertEquals("admin", actualUser.getUsername());
-        assertEquals("admin", actualUser.getPassword());
         assertEquals("admin@workout.com", actualUser.getEmail());
     }
 

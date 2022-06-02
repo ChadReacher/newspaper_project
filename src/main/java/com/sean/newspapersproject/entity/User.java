@@ -1,12 +1,8 @@
 package com.sean.newspapersproject.entity;
 
 import com.sean.newspapersproject.security.Role;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.util.Objects;
 import java.util.Set;
 
@@ -35,7 +31,6 @@ public class User {
     private Image imageId;
 
     @ManyToMany(
-            cascade = CascadeType.ALL,
             fetch = FetchType.EAGER
     )
     @JoinTable(

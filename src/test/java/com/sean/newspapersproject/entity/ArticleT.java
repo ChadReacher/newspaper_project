@@ -1,5 +1,6 @@
 package com.sean.newspapersproject.entity;
 
+import com.sean.newspapersproject.security.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,14 +12,14 @@ public class ArticleT {
 
     private Article article;
 
-//    @BeforeEach
-//    public void setup() {
-//        User user = new User("username", "password", "user@usr.com");
-//        Category category = new Category("Life");
-//        Magazine magazine = new Magazine("Fashion-profession");
-//        this.article = new Article("Interesting title", "Short description", "Big text", LocalDateTime.now(),
-//                user, category, null);
-//    }
+    @BeforeEach
+    public void setup() {
+        User user = new User("username", "Bob", "Marley", "password", "user@usr.com", null, Role.USER);
+        Category category = new Category("Life");
+        Magazine magazine = new Magazine("Fashion-profession", null, user);
+        this.article = new Article("Interesting title", "Short description", "Big text", LocalDateTime.now(),
+                magazine.getAuthor(), category, magazine, null);
+    }
 
 
     @Test
@@ -53,11 +54,4 @@ public class ArticleT {
         assertEquals(category.getName(), article.getCategory().getName());
     }
 
-    @Test
-    public void testMagazineFieldGetter() {
-        if (article.getMagazine() != null) {
-//            Magazine magazine = new Magazine("Fashion-profession");
-//            assertEquals(magazine.getName(), article.getMagazine().getName());
-        }
-    }
 }

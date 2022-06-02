@@ -4,24 +4,23 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import com.sean.newspapersproject.entity.Article;
 import com.sean.newspapersproject.entity.Category;
+import com.sean.newspapersproject.entity.Magazine;
 import com.sean.newspapersproject.entity.User;
-import com.sean.newspapersproject.repository.CategoryRepository;
-import com.sean.newspapersproject.repository.UserRepository;
 import com.sean.newspapersproject.security.Role;
 import com.sean.newspapersproject.service.ArticleService;
 import com.sean.newspapersproject.service.CategoryService;
+import com.sean.newspapersproject.service.MagazineService;
 import com.sean.newspapersproject.service.UserService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.htmlunit.MockMvcWebClientBuilder;
@@ -29,7 +28,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
@@ -57,10 +58,16 @@ public class MainControllerTest {
     private ArticleService articleService;
 
     @Autowired
+    private MagazineService magazineService;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private AuthenticationProvider authenticationProvider;
 
     private WebClient webClient;
 
@@ -74,6 +81,19 @@ public class MainControllerTest {
     @Test
     @Order(1)
     public void testMainPageExists() throws Exception {
+        User user = new User("username", "Bob", "Marley", "password", "user@usr.com", null, Role.USER);
+        userService.save(user);
+
+        Category category = new Category("Life");
+        categoryService.save(category);
+
+        Magazine magazine = new Magazine("Fashion-profession", null, user);
+        magazineService.save(magazine);
+
+        Article article = new Article("Interesting title", "Short description", "Big text", LocalDateTime.now(),
+                magazine.getAuthor(), category, magazine, null);
+        articleService.save(article);
+
         this.mockMvc.perform(MockMvcRequestBuilders.get("/"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Online newspaper")));
@@ -84,17 +104,19 @@ public class MainControllerTest {
     @Order(2)
     public void testArticleCreationPageExists() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/create-article"))
-                .andExpect(status().isOk());
+                .andExpect(status().is3xxRedirection());
     }
 
     @Test
     @Order(3)
     public void testPostingArticle() throws Exception {
-        User user = new User(
-                "username", "Tommy", "Resc", "username", "user@name.com", null, Role.USER);
-        Category category = new Category("Sport");
-        userService.save(user);
+        User user = userService.getUserByUsername("username");
+
+        Category category = new Category("Life");
         categoryService.save(category);
+
+        Magazine magazine = new Magazine("Fashion-profession", null, user);
+        magazineService.save(magazine);
 
         Long articleId = 1L;
         String title = "Test title";
@@ -104,17 +126,16 @@ public class MainControllerTest {
         String formId = "createArticleForm";
         String categorySelectId = "formGroupSelect";
 
+        String base64encodedUsernameAndPassword = DatatypeConverter.printBase64Binary(user.getUsername().getBytes()) + ":" + user.getPassword();
+//        webClient.addRequestHeader("Authorization", "Basic " + base64encodedUsernameAndPassword);
+
         try {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                    userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities()
-            );
-            Authentication authentication2 = authenticationManager.authenticate(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication2);
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getRole().getGrantedAuthorities());
+            Authentication authentication = this.authenticationProvider.authenticate(token);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (Exception e) {
             SecurityContextHolder.getContext().setAuthentication(null);
         }
-
 
         HtmlPage createMsgFormPage = webClient.getPage("http://localhost/create-article/");
 
@@ -162,6 +183,8 @@ public class MainControllerTest {
         String text = "Some big test text updated";
         String formId = "updateArticleForm";
 
+
+
         HtmlPage createMsgFormPage = webClient.getPage("http://localhost/update-article/" + articleId);
 
         HtmlForm form = createMsgFormPage.getHtmlElementById(formId);
@@ -189,6 +212,7 @@ public class MainControllerTest {
     public void testDeleteArticle() throws IOException {
         Long articleId = 1L;
         String formId = "deleteArticleForm";
+
 
         HtmlPage createMsgFormPage = webClient.getPage("http://localhost/article/" + articleId);
 

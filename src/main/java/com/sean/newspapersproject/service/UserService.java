@@ -114,4 +114,5 @@ public class UserService {
     public boolean isUserWithEmailExists(String email) {
         return userRepository.findByEmail(email).orElse(null) == null;
     }
+
 }
