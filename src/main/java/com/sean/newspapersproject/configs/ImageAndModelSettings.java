@@ -37,10 +37,10 @@ public class ImageAndModelSettings {
     public static void getImageStringFromArticleAndPutInModel(Article article, Model model) {
         try {
             String imageString = Base64.getMimeEncoder().encodeToString(article.getImageId().getImageData());
-            model.addAttribute("imageString", imageString);
+            model.addAttribute("articleImageString", imageString);
         } catch (Exception e) {
             String imageString = "";
-            model.addAttribute("imageString", imageString);
+            model.addAttribute("articleImageString", imageString);
         }
     }
 

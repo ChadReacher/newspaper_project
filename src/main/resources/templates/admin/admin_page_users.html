@@ -101,9 +101,12 @@
                           <form th:method="POST" th:action="@{/admin/users/change-role}">
                             <div class="modal-body">
                               <div class="mb-3">
-                                <input type="text" name="username" class="form-control" th:value="${user.getUsername()}">
-                                <input type="text" name="firstName" class="form-control" th:value="${user.getFirstName()}">
-                                <input type="text" name="lastName" class="form-control" th:value="${user.getLastName()}">
+                                <label for="inputUserName" class="form-label">Username</label>
+                                <input type="text" id="inputUserName" style="margin-bottom: 10px;" name="username" class="form-control" th:value="${user.getUsername()}">
+                                <label for="inputUserName" class="form-label">First name</label>
+                                <input type="text" id="inputFirstName" style="margin-bottom: 10px;" name="firstName" class="form-control" th:value="${user.getFirstName()}">
+                                <label for="inputUserName" class="form-label">Last name</label>
+                                <input type="text" id="inputLastName" style="margin-bottom: 10px;" name="lastName" class="form-control" th:value="${user.getLastName()}">
                                 <input type="hidden" th:value="${user.getUserId()}" name="userId">
                                 <label for="formGroupSelect" class="form-label">Role</label>
                                 <select name="role" class="form-select" aria-label="Default select example" id="formGroupSelect">

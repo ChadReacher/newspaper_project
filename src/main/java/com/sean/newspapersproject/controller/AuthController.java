@@ -1,6 +1,7 @@
 package com.sean.newspapersproject.controller;
 
 import com.sean.newspapersproject.configs.ImageAndModelSettings;
+import com.sean.newspapersproject.entity.Article;
 import com.sean.newspapersproject.entity.Image;
 import com.sean.newspapersproject.entity.Magazine;
 import com.sean.newspapersproject.entity.User;
@@ -160,6 +161,11 @@ public class AuthController {
     @PostMapping("update-user/change-image")
     public String changeUserAuthenticatedImage(@RequestParam("imageData") MultipartFile imageData) {
         User user = getAuthenticatedUserFromPage();
+        updateUserImage(imageData, user);
+        return "redirect:/user";
+    }
+
+    public void updateUserImage(MultipartFile imageData, User user) {
         try {
             String fileName = StringUtils.cleanPath(imageData.getOriginalFilename());
             if (!fileName.isEmpty()) {
@@ -171,7 +177,6 @@ public class AuthController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "redirect:/user";
     }
 
     @PostMapping("update-user")

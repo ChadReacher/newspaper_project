@@ -7,6 +7,7 @@ import com.sean.newspapersproject.entity.Category;
 import com.sean.newspapersproject.entity.Magazine;
 import com.sean.newspapersproject.entity.User;
 import com.sean.newspapersproject.security.Role;
+import com.sean.newspapersproject.security.UserDetailsServiceImpl;
 import com.sean.newspapersproject.service.ArticleService;
 import com.sean.newspapersproject.service.CategoryService;
 import com.sean.newspapersproject.service.MagazineService;
@@ -20,20 +21,28 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.htmlunit.MockMvcWebClientBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.context.WebApplicationContext;
 
 
+import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Enumeration;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
@@ -94,7 +103,7 @@ public class MainControllerTest {
                 magazine.getAuthor(), category, magazine, null);
         articleService.save(article);
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/"))
+        this.mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Online newspaper")));
     }
@@ -103,14 +112,16 @@ public class MainControllerTest {
     @Test
     @Order(2)
     public void testArticleCreationPageExists() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/create-article"))
+        this.mockMvc.perform(get("/create-article"))
                 .andExpect(status().is3xxRedirection());
     }
 
     @Test
     @Order(3)
     public void testPostingArticle() throws Exception {
-        User user = userService.getUserByUsername("username");
+        User user = new User("username", "Bob", "Marley", "password", "user@usr.com", null, Role.USER);
+        userService.save(user);
+
 
         Category category = new Category("Life");
         categoryService.save(category);
@@ -167,7 +178,7 @@ public class MainControllerTest {
     public void testArticlePageByExistingIdExists() throws Exception {
         Long articleId = 1L;
         Article article = articleService.getArticleById(articleId);
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/article/{id}", articleId))
+        this.mockMvc.perform(get("/article/{id}", articleId))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString(article.getTitle())))
                 .andExpect(content().string(containsString(article.getDescription())))
