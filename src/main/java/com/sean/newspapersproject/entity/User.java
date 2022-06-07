@@ -161,7 +161,7 @@ public class User {
         return Objects.equals(userId, user.userId) && Objects.equals(username, user.username)
                 && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName)
                 && Objects.equals(password, user.password) && Objects.equals(email, user.email)
-                && Objects.equals(followedMagazines, user.followedMagazines) && role == user.role;
+                && role == user.role;
     }
 
     @Override

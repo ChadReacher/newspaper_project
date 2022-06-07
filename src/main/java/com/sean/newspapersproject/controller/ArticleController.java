@@ -6,6 +6,7 @@ import com.sean.newspapersproject.security.SecurityUser;
 import com.sean.newspapersproject.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -31,15 +32,17 @@ public class ArticleController {
     private final CategoryService categoryService;
     private final ImageService imageService;
     private final CommentService commentService;
+    private final LikeService likeService;
 
     @Autowired
     public ArticleController(ArticleService articleService, MagazineService magazineService, CategoryService categoryService,
-                             ImageService imageService, CommentService commentService) {
+                             ImageService imageService, CommentService commentService, LikeService likeService) {
         this.articleService = articleService;
         this.magazineService = magazineService;
         this.categoryService = categoryService;
         this.imageService = imageService;
         this.commentService = commentService;
+        this.likeService = likeService;
     }
 
     public User getAuthenticatedUserFromPage() {
@@ -67,6 +70,18 @@ public class ArticleController {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimeFormatterPattern);
         model.addAttribute("dateTimeFormatter", dateTimeFormatter);
 
+        int numberOfLikes = likeService.getNumberOfLikesOfArticle(article);
+        model.addAttribute("numberOfLikes", numberOfLikes);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            User user = getAuthenticatedUserFromPage();
+            boolean isUserAnAuthorOfArticle = article.getUserId().equals(user);
+            boolean isUserLikedTheArticle = likeService.isUserLikedTheArticle(user, article);
+            model.addAttribute("isUserAnAuthorOfArticle", isUserAnAuthorOfArticle);
+            model.addAttribute("isUserLikedTheArticle", isUserLikedTheArticle);
+        }
+
         initializeMapOfUserImagesInCommentsAndSetToModel(articleComments, model);
         ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
         ImageAndModelSettings.getImageStringFromArticleAndPutInModel(article, model);
@@ -87,6 +102,21 @@ public class ArticleController {
     public String setCommentToTheArticle(@PathVariable("id") Long id, @ModelAttribute("comment") Comment createdComment) {
         Article article = articleService.getArticleById(id);
         commentService.postCommentToTheArticle(createdComment, article);
+        return "redirect:/article/" + article.getArticleId();
+    }
+
+    @PostMapping("article/{id}/like")
+    public String setLikeToArticleById(@PathVariable("id") Long id) {
+        Article article = articleService.getArticleById(id);
+        User user = getAuthenticatedUserFromPage();
+        boolean isUserLikedTheArticle = likeService.isUserLikedTheArticle(user, article);
+        if (isUserLikedTheArticle) {
+            Like like = likeService.getLikeByUserAndArticle(user, article);
+            likeService.delete(like);
+        } else {
+            Like articleLike = new Like(user, article);
+            likeService.save(articleLike);
+        }
         return "redirect:/article/" + article.getArticleId();
     }
 

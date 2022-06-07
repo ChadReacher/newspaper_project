@@ -1,8 +1,5 @@
 package com.sean.newspapersproject.entity;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
