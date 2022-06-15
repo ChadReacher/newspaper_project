@@ -17,11 +17,6 @@ public class ImageService {
     private ImageRepository imageRepository;
 
     @Autowired
-    public List<Image> getAllImages() {
-        List<Image> images = imageRepository.findAll();
-        return images;
-    }
-
     public ImageService(ImageRepository imageRepository) {
         this.imageRepository = imageRepository;
     }
@@ -29,6 +24,11 @@ public class ImageService {
     public Image getImageById(Long id) {
         Image image = imageRepository.findById(id).get();
         return image;
+    }
+
+    public List<Image> getAllImages() {
+        List<Image> images = imageRepository.findAll();
+        return images;
     }
 
     public void save(Image image) {

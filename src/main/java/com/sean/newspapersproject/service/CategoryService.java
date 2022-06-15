@@ -42,7 +42,6 @@ public class CategoryService {
     public void update(Long id, Category updatedCategory) {
         Category categoryToUpdate = getCategoryById(id);
         categoryRepository.updateCategoryById(id, updatedCategory);
-        categoryRepository.save(categoryToUpdate);
     }
 
     @Transactional

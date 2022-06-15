@@ -49,11 +49,6 @@ public class CommentService {
         return comments;
     }
 
-    public List<Comment> getCommentsByUser(User user) {
-        List<Comment> comments = commentRepository.findByUserId(user);
-        return comments;
-    }
-
     public List<Comment> getCommentsByArticle(Article article) {
         List<Comment> comments = commentRepository.findByArticleId(article);
         return comments;

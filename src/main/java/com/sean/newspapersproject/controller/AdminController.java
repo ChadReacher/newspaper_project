@@ -146,7 +146,7 @@ public class AdminController {
     }
 
     @PostMapping("/categories/edit/{id}")
-    public String saveCategoryAdmin(@PathVariable("id") Long id, @ModelAttribute("category") Category updateCategory) {
+    public String updateCategoryAdmin(@PathVariable("id") Long id, @ModelAttribute("category") Category updateCategory) {
         categoryService.update(id, updateCategory);
         return "redirect:/admin/categories";
     }

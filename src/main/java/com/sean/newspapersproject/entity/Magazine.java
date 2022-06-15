@@ -85,6 +85,6 @@ public class Magazine {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, imageId, author);
+        return Objects.hash(name, imageId);
     }
 }

@@ -83,12 +83,11 @@ public class UserService {
             updatedUser.setPassword(encodedPassword);
         }
         userRepository.updateUserById(id, updatedUser);
-        userRepository.save(userToUpdate);
     }
 
     @Transactional
     public void delete(Long id) {
-        List<Article> articles = articleService.getAllArticlesByUserId(id);
+        List<Article> articles = articleService.getAllArticlesByUserId(getUserById(id));
         List<Comment> comments = commentService.getCommentsByUserId(id);
         for (Article article : articles) {
             articleService.delete(article);
@@ -100,11 +99,6 @@ public class UserService {
         Magazine magazineByAuthor = magazineService.getMagazineByAuthor(getUserById(id));
         magazineService.delete(magazineByAuthor.getMagazineId());
         userRepository.deleteById(id);
-    }
-
-    public User getUserByEmail(String email) {
-        User user = userRepository.findByEmail(email).orElse(null);
-        return user;
     }
 
     public boolean isUserWithUsernameExists(String username) {

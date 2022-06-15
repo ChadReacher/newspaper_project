@@ -49,18 +49,15 @@ public class ArticleService {
     public List<Article> getArticlesPages(Integer pageNumber, String sortColumn) {
         Pageable firstPageWithTenArticlesSortedByName =
                 PageRequest.of(pageNumber - 1, 10, Sort.by(sortColumn).ascending());
-        List<Article> articles = articleRepository.findAll(firstPageWithTenArticlesSortedByName).toList();
-        return articles;
+        return articleRepository.findAll(firstPageWithTenArticlesSortedByName).toList();
     }
 
-    public List<Article> getAllArticlesByUserId(Long id) {
-        List<Article> articles = articleRepository.findAllByUserId(id);
-        return articles;
+    public List<Article> getAllArticlesByUserId(User user) {
+        return articleRepository.findAllByUserId(user);
     }
 
     public List<Article> getArticleByTitle(String articleTitle) {
-        List<Article> articles = articleRepository.findAllByTitle(articleTitle);
-        return articles;
+        return articleRepository.findAllByTitle(articleTitle);
     }
 
     public void saveArticleWithUser(Article article, User user) {
@@ -77,12 +74,10 @@ public class ArticleService {
         articleRepository.save(article);
     }
 
-    @Transactional
     public void update(Long id, Article updatedArticle) {
         Article articleToUpdate = getArticleById(id);
         articleRepository.updateArticleById(id, updatedArticle);
         articleToUpdate.setImageId(updatedArticle.getImageId());
-        articleRepository.save(articleToUpdate);
     }
 
     @Transactional
@@ -101,7 +96,6 @@ public class ArticleService {
     }
 
     public List<Article> getAllArticleByMagazine(Magazine magazine) {
-        List<Article> articlesFromMagazine = articleRepository.findAllByMagazine(magazine);
-        return articlesFromMagazine;
+        return articleRepository.findAllByMagazine(magazine);
     }
 }

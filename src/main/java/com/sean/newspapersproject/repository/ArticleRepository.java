@@ -3,6 +3,7 @@ package com.sean.newspapersproject.repository;
 import com.sean.newspapersproject.entity.Article;
 import com.sean.newspapersproject.entity.Comment;
 import com.sean.newspapersproject.entity.Magazine;
+import com.sean.newspapersproject.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -24,11 +25,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
                     "where a.articleId = :id")
     void updateArticleById(@Param("id") Long id, @Param("article") Article updatedArticle);
 
-    @Query(
-            value = "SELECT * FROM article WHERE user_id = :id",
-            nativeQuery = true
-    )
-    List<Article> findAllByUserId(@Param("id") Long id);
+    List<Article> findAllByUserId(User user);
 
     List<Article> findAllByMagazine(Magazine magazine);
 

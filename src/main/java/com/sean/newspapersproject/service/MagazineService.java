@@ -46,7 +46,6 @@ public class MagazineService {
         Magazine magazineToUpdate = getMagazineById(id);
         magazineToUpdate.setName(updatedMagazine.getName());
         magazineToUpdate.setImageId(updatedMagazine.getImageId());
-        magazineRepository.save(magazineToUpdate);
     }
 
     @Transactional

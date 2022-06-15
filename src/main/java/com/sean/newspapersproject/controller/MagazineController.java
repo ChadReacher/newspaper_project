@@ -84,10 +84,10 @@ public class MagazineController {
     @PostMapping("magazine/{id}/follow")
     public String followMagazineById(@PathVariable("id") Long id) {
         User authenticatedUser = getAuthenticatedUserFromPage();
-        Magazine authenticatedUsersMagazine = magazineService.getMagazineById(id);
-        authenticatedUser.followMagazine(authenticatedUsersMagazine);
+        Magazine magazineToFollow = magazineService.getMagazineById(id);
+        authenticatedUser.followMagazine(magazineToFollow);
         userService.save(authenticatedUser);
-        return "redirect:/";
+        return "redirect:/magazine/" + id;
     }
 
     @GetMapping("create-magazine")
