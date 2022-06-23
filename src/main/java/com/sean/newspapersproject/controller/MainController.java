@@ -39,8 +39,12 @@ public class MainController {
     @GetMapping
     public String getMainPage(Model model) {
         List<Article> articles = articleService.getAllArticles().stream().skip(1).limit(5).collect(Collectors.toList());
-        Article firstArticle = articleService.getAllArticles().get(0);
-        model.addAttribute("firstArticle", firstArticle);
+        if (articleService.getAllArticles().size() != 0) {
+            Article firstArticle = articleService.getAllArticles().get(0);
+            model.addAttribute("firstArticle", firstArticle);
+        } else {
+            model.addAttribute("firstArticle", null);
+        }
         initializeMapOfArticleImagesAndSetToModel(articles, model);
         ImageAndModelSettings.updateModelWithAuthenticatedUserAndImageStringFromAuthenticatedUser(model);
         String dateTimeFormatterPattern = "yyyy-MM-dd HH:mm:ss";

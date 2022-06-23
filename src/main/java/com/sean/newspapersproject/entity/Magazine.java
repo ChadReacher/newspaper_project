@@ -2,6 +2,7 @@ package com.sean.newspapersproject.entity;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 public class Magazine {
@@ -14,6 +15,7 @@ public class Magazine {
     )
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "magazine_sequence")
     private Long magazineId;
+
     private String name;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -24,6 +26,9 @@ public class Magazine {
     @JoinColumn(name = "user_id")
     private User author;
 
+    @ManyToMany(mappedBy = "followedMagazines")
+    private Set<User> followedUsers;
+
     public Magazine(String name, Image imageId, User author) {
         this.name = name;
         this.imageId = imageId;
@@ -32,6 +37,14 @@ public class Magazine {
 
     public Magazine() {
 
+    }
+
+    public Set<User> getFollowedUsers() {
+        return followedUsers;
+    }
+
+    public void setFollowedUsers(Set<User> followedUsers) {
+        this.followedUsers = followedUsers;
     }
 
     public User getAuthor() {

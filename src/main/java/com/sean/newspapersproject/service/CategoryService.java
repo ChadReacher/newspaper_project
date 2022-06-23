@@ -40,7 +40,6 @@ public class CategoryService {
 
     @Transactional
     public void update(Long id, Category updatedCategory) {
-        Category categoryToUpdate = getCategoryById(id);
         categoryRepository.updateCategoryById(id, updatedCategory);
     }
 

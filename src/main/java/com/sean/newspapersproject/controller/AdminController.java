@@ -27,15 +27,20 @@ public class AdminController {
     private UserService userService;
     private CategoryService categoryService;
     private ImageService imageService;
+    private ArticleFacade articleFacade;
+    private UserFacade userFacade;
 
     @Autowired
     public AdminController(ArticleService articleService, MagazineService magazineService, UserService userService,
-                           CategoryService categoryService, ImageService imageService) {
+                           CategoryService categoryService, ImageService imageService, ArticleFacade articleFacade,
+                           UserFacade userFacade) {
         this.articleService = articleService;
         this.magazineService = magazineService;
         this.userService = userService;
         this.categoryService = categoryService;
         this.imageService = imageService;
+        this.articleFacade = articleFacade;
+        this.userFacade = userFacade;
     }
 
     @GetMapping
@@ -64,7 +69,7 @@ public class AdminController {
 
     @PostMapping("/articles")
     public String deleteArticleByIdAdmin(@RequestParam("articleId") String id) {
-        articleService.delete(Long.valueOf(Integer.parseInt(id)));
+        articleFacade.deleteArticle(Long.valueOf(id));
         return "redirect:/admin/articles";
     }
 
@@ -102,7 +107,7 @@ public class AdminController {
 
     @PostMapping("/users")
     public String deleteUserByIdAdmin(@RequestParam("userId") String id) {
-        userService.delete((long) Integer.parseInt(id));
+        userFacade.deleteUser(Long.valueOf(id));
         return "redirect:/admin/users";
     }
 

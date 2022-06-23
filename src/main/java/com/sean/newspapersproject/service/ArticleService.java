@@ -18,16 +18,13 @@ public class ArticleService {
 
     private ArticleRepository articleRepository;
     private CategoryService categoryService;
-    private MagazineService magazineService;
-    private CommentService commentService;
+    private LikeService likeService;
 
     @Autowired
-    public ArticleService(ArticleRepository articleRepository, CategoryService categoryService, @Lazy MagazineService magazineService,
-                          @Lazy CommentService commentService) {
+    public ArticleService(ArticleRepository articleRepository, CategoryService categoryService, LikeService likeService) {
         this.articleRepository = articleRepository;
         this.categoryService = categoryService;
-        this.magazineService = magazineService;
-        this.commentService = commentService;
+        this.likeService = likeService;
     }
 
     public List<Article> getAllArticles() {
@@ -52,21 +49,10 @@ public class ArticleService {
         return articleRepository.findAll(firstPageWithTenArticlesSortedByName).toList();
     }
 
-    public List<Article> getAllArticlesByUserId(User user) {
-        return articleRepository.findAllByUserId(user);
-    }
-
-    public List<Article> getArticleByTitle(String articleTitle) {
-        return articleRepository.findAllByTitle(articleTitle);
-    }
-
-    public void saveArticleWithUser(Article article, User user) {
+    public void saveArticle(Article article) {
         Category category = categoryService.getCategoryByName(article.getCategory().getName());
         article.setCategory(category);
         article.setCreatedAt(LocalDateTime.now());
-        article.setUserId(user);
-        Magazine magazine = magazineService.getMagazineByAuthor(user);
-        article.setMagazine(magazine);
         articleRepository.save(article);
     }
 
@@ -80,15 +66,6 @@ public class ArticleService {
         articleToUpdate.setImageId(updatedArticle.getImageId());
     }
 
-    @Transactional
-    public void delete(Long id) {
-        Article article = getArticleById(id);
-        List<Comment> comments = commentService.getCommentsByArticle(article);
-        for (Comment comment : comments) {
-            commentService.delete(comment);
-        }
-        articleRepository.deleteById(id);
-    }
 
     @Transactional
     public void delete(Article article) {

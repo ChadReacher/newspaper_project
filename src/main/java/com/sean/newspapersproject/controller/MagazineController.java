@@ -3,10 +3,7 @@ package com.sean.newspapersproject.controller;
 import com.sean.newspapersproject.configs.ImageAndModelSettings;
 import com.sean.newspapersproject.entity.*;
 import com.sean.newspapersproject.security.SecurityUser;
-import com.sean.newspapersproject.service.ArticleService;
-import com.sean.newspapersproject.service.ImageService;
-import com.sean.newspapersproject.service.MagazineService;
-import com.sean.newspapersproject.service.UserService;
+import com.sean.newspapersproject.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -31,14 +28,16 @@ public class MagazineController {
     private final ImageService imageService;
     private final ArticleService articleService;
     private final UserService userService;
+    private final MagazineFacade magazineFacade;
 
     @Autowired
     public MagazineController(MagazineService magazineService, ImageService imageService, ArticleService articleService,
-                              UserService userService) {
+                              UserService userService, MagazineFacade magazineFacade) {
         this.magazineService = magazineService;
         this.imageService = imageService;
         this.articleService = articleService;
         this.userService = userService;
+        this.magazineFacade = magazineFacade;
     }
 
     public User getAuthenticatedUserFromPage() {
@@ -63,6 +62,9 @@ public class MagazineController {
                     break;
                 }
             }
+            if (magazine.getAuthor().equals(user)) {
+                model.addAttribute("isFollowMagazine", true);
+            }
         } else {
             model.addAttribute("isFollowMagazine", true);
         }
@@ -85,8 +87,7 @@ public class MagazineController {
     public String followMagazineById(@PathVariable("id") Long id) {
         User authenticatedUser = getAuthenticatedUserFromPage();
         Magazine magazineToFollow = magazineService.getMagazineById(id);
-        authenticatedUser.followMagazine(magazineToFollow);
-        userService.save(authenticatedUser);
+        userService.followMagazine(authenticatedUser, magazineToFollow);
         return "redirect:/magazine/" + id;
     }
 
@@ -107,7 +108,7 @@ public class MagazineController {
 
     @PostMapping("delete-magazine/{id}")
     public String deleteMagazineById(@PathVariable("id") Long id) {
-        magazineService.delete(id);
+        magazineFacade.deleteMagazine(id);
         return "redirect:/";
     }
 

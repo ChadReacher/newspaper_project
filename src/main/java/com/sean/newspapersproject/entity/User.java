@@ -3,6 +3,7 @@ package com.sean.newspapersproject.entity;
 import com.sean.newspapersproject.security.Role;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -31,14 +32,15 @@ public class User {
     private Image imageId;
 
     @ManyToMany(
-            fetch = FetchType.EAGER
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.PERSIST
     )
     @JoinTable(
             name = "user_magazine_map",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "magazine_id")}
+            joinColumns = {@JoinColumn(name = "user_id", unique = true)},
+            inverseJoinColumns = {@JoinColumn(name = "magazine_id", unique = true)}
     )
-    private Set<Magazine> followedMagazines;
+    private Set<Magazine> followedMagazines = new HashSet<>();
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "role")
@@ -122,14 +124,6 @@ public class User {
 
     public void setFollowedMagazines(Set<Magazine> followedMagazines) {
         this.followedMagazines = followedMagazines;
-    }
-
-    public void followMagazine(Magazine magazine) {
-        this.followedMagazines.add(magazine);
-    }
-
-    public void unfollowMagazine(Magazine magazine) {
-        this.followedMagazines.remove(magazine);
     }
 
     public Role getRole() {

@@ -33,16 +33,19 @@ public class ArticleController {
     private final ImageService imageService;
     private final CommentService commentService;
     private final LikeService likeService;
+    private final ArticleFacade articleFacade;
 
     @Autowired
     public ArticleController(ArticleService articleService, MagazineService magazineService, CategoryService categoryService,
-                             ImageService imageService, CommentService commentService, LikeService likeService) {
+                             ImageService imageService, CommentService commentService, LikeService likeService,
+                             ArticleFacade articleFacade) {
         this.articleService = articleService;
         this.magazineService = magazineService;
         this.categoryService = categoryService;
         this.imageService = imageService;
         this.commentService = commentService;
         this.likeService = likeService;
+        this.articleFacade = articleFacade;
     }
 
     public User getAuthenticatedUserFromPage() {
@@ -111,11 +114,11 @@ public class ArticleController {
         User user = getAuthenticatedUserFromPage();
         boolean isUserLikedTheArticle = likeService.isUserLikedTheArticle(user, article);
         if (isUserLikedTheArticle) {
-            Like like = likeService.getLikeByUserAndArticle(user, article);
-            likeService.delete(like);
+            Like likeToDelete = likeService.getLikeByUserAndArticle(user, article);
+            likeService.delete(likeToDelete);
         } else {
-            Like articleLike = new Like(user, article);
-            likeService.save(articleLike);
+            Like newLikeForArticle = new Like(user, article);
+            likeService.save(newLikeForArticle);
         }
         return "redirect:/article/" + article.getArticleId();
     }
@@ -140,7 +143,10 @@ public class ArticleController {
                                       @RequestParam("image") MultipartFile imageData) {
         saveImageAndSetToArticle(imageData, createdArticle);
         User user = getAuthenticatedUserFromPage();
-        articleService.saveArticleWithUser(createdArticle, user);
+        Magazine magazine = magazineService.getMagazineByAuthor(user);
+        createdArticle.setUserId(user);
+        createdArticle.setMagazine(magazine);
+        articleService.saveArticle(createdArticle);
         return "redirect:/";
     }
 
@@ -183,7 +189,7 @@ public class ArticleController {
 
     @PostMapping("delete-article/{id}")
     public String deleteArticleById(@PathVariable("id") Long id) {
-        articleService.delete(id);
+        articleFacade.deleteArticle(id);
         return "redirect:/";
     }
 }

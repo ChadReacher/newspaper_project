@@ -49,13 +49,8 @@ public class MagazineService {
     }
 
     @Transactional
-    public void delete(Long id) {
-        Magazine magazine = getMagazineById(id);
-        List<Article> articles = articleService.getAllArticleByMagazine(magazine);
-        for (Article article : articles) {
-            articleService.delete(article);
-        }
-        magazineRepository.deleteById(id);
+    public void delete(Magazine magazine) {
+        magazineRepository.delete(magazine);
     }
 
     public Magazine getMagazineByAuthor(User user) {

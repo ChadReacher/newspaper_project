@@ -1,9 +1,7 @@
 package com.sean.newspapersproject.service;
 
-import com.sean.newspapersproject.entity.Article;
-import com.sean.newspapersproject.entity.Comment;
-import com.sean.newspapersproject.entity.Magazine;
-import com.sean.newspapersproject.entity.User;
+import com.sean.newspapersproject.entity.*;
+import com.sean.newspapersproject.repository.CommentRepository;
 import com.sean.newspapersproject.repository.MagazineRepository;
 import com.sean.newspapersproject.repository.UserRepository;
 import com.sean.newspapersproject.security.config.BcryptPasswordEncoder;
@@ -19,24 +17,15 @@ import java.util.Set;
 public class UserService {
 
     private UserRepository userRepository;
-    private ArticleService articleService;
-    private CommentService commentService;
-    private MagazineService magazineService;
     private BcryptPasswordEncoder passwordEncoder;
-
+    private MagazineService magazineService;
 
     @Autowired
-    public UserService(UserRepository userRepository, ArticleService articleService,
-                       CommentService commentService, BcryptPasswordEncoder passwordEncoder,
-                       MagazineService magazineService) {
+    public UserService(UserRepository userRepository, BcryptPasswordEncoder passwordEncoder, MagazineService magazineService) {
         this.userRepository = userRepository;
-        this.articleService = articleService;
-        this.commentService = commentService;
         this.passwordEncoder = passwordEncoder;
         this.magazineService = magazineService;
     }
-
-
 
     public List<User> getAllUsers() {
         List<User> users = userRepository.findAll();
@@ -67,6 +56,22 @@ public class UserService {
         userRepository.save(user);
     }
 
+
+    public void followMagazine(User user, Magazine magazine) {
+        user.getFollowedMagazines().add(magazine);
+        magazine.getFollowedUsers().add(user);
+        userRepository.save(user);
+        magazineService.save(magazine);
+
+    }
+
+    public void unfollowMagazine(User user, Magazine magazine) {
+        user.getFollowedMagazines().remove(magazine);
+        magazine.getFollowedUsers().remove(user);
+        userRepository.save(user);
+        magazineService.save(magazine);
+    }
+
     @Transactional
     public void update(Long id, User updatedUser) {
         User userToUpdate = getUserById(id);
@@ -86,27 +91,16 @@ public class UserService {
     }
 
     @Transactional
-    public void delete(Long id) {
-        List<Article> articles = articleService.getAllArticlesByUserId(getUserById(id));
-        List<Comment> comments = commentService.getCommentsByUserId(id);
-        for (Article article : articles) {
-            articleService.delete(article);
-        }
-        for (Comment comment : comments) {
-            commentService.delete(comment);
-        }
-
-        Magazine magazineByAuthor = magazineService.getMagazineByAuthor(getUserById(id));
-        magazineService.delete(magazineByAuthor.getMagazineId());
-        userRepository.deleteById(id);
+    protected void delete(User user) {
+        userRepository.delete(user);
     }
 
     public boolean isUserWithUsernameExists(String username) {
-        return userRepository.findByUsername(username).orElse(null) == null;
+        return userRepository.findByUsername(username).orElse(null) != null;
     }
 
     public boolean isUserWithEmailExists(String email) {
-        return userRepository.findByEmail(email).orElse(null) == null;
+        return userRepository.findByEmail(email).orElse(null) != null;
     }
 
 }

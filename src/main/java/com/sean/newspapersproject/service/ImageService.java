@@ -31,6 +31,7 @@ public class ImageService {
         return images;
     }
 
+    @Transactional
     public void save(Image image) {
         imageRepository.save(image);
     }

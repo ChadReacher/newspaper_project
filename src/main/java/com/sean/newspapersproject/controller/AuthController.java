@@ -73,7 +73,9 @@ public class AuthController {
     public String registerUser(@ModelAttribute("user") User user,  @RequestParam("confirmPassword") String confirmPassword,
                                @RequestParam("image") MultipartFile imageData, Model model) {
         boolean isUserWithUsernameExists = userService.isUserWithUsernameExists(user.getUsername());
+        System.out.println(user.getEmail());
         boolean isUserWithEmailExists = userService.isUserWithEmailExists(user.getEmail());
+        System.out.println(isUserWithEmailExists);
         boolean isPasswordAndConfirmPasswordEqual = user.getPassword().equals(confirmPassword);
         if (isUserWithUsernameExists) {
             model.addAttribute("userExists", "User with this username already exists");
@@ -145,8 +147,7 @@ public class AuthController {
     public String unfollowMagazine(@PathVariable("id") Long id) {
         User user = getAuthenticatedUserFromPage();
         Magazine magazineToUnfollow = magazineService.getMagazineById(id);
-        user.unfollowMagazine(magazineToUnfollow);
-        userService.save(user);
+        userService.unfollowMagazine(user, magazineToUnfollow);
         return "redirect:/user";
     }
 
