@@ -14,9 +14,7 @@ As a main build automation tool I used Maven. <br/>
 ## Difficult coding parts and future ideas about the project
 The most difficult part of creating the website was implementing
 authentication through web forms because it was my first time to do it using html forms.
-In the near future it'd be a good idea to implement a liking system,
-when users can like each other's article.
-Of course, don't forget about adding tests, I have some problems with.
+In the near future it'd be a good idea to add some tests.
 
 
 ## Installation
